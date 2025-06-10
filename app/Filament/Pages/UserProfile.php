@@ -11,7 +11,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = 'User Profile';
     protected static string $view = 'filament.pages.user-profile';
     protected static ?string $title = 'Edit User Profile';
