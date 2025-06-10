@@ -2,7 +2,12 @@
 
 namespace App\Providers;
 
+use App\Filament\Pages\UserProfile;
+use Filament\Facades\Filament;
 use Illuminate\Support\ServiceProvider;
+use Filament\Support\Assets;
+use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Support\Facades\Vite;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +24,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Filament::registerPages([
+            UserProfile::class,
+        ]);
+        FilamentAsset::register([
+            Assets\Css::make('app', Vite::asset('resources/scss/app.scss')),
+            Assets\Js::make('app', Vite::asset('resources/js/app.js')),
+        ]);
     }
 }
