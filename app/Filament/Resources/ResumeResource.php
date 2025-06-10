@@ -2,18 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CompanyResource\Pages;
-use App\Filament\Resources\CompanyResource\RelationManagers;
-use App\Models\Company;
+use App\Filament\Resources\ResumeResource\Pages;
+use App\Filament\Resources\ResumeResource\RelationManagers;
+use App\Models\Resume;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CompanyResource extends Resource
+class ResumeResource extends Resource
 {
-    protected static ?string $model = Company::class;
+    protected static ?string $model = Resume::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -21,7 +23,7 @@ class CompanyResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->required()->columnSpanFull()
+                Forms\Components\TextInput::make('name')->required()->columnSpanFull(),
             ]);
     }
 
@@ -29,10 +31,10 @@ class CompanyResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable()
+                Tables\Columns\TextColumn::make('position')->searchable(),
             ])
             ->filters([
-                //    
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -48,16 +50,16 @@ class CompanyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ExperienceRelationManager::class
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCompanies::route('/'),
-            'create' => Pages\CreateCompany::route('/create'),
-            'edit' => Pages\EditCompany::route('/{record}/edit'),
+            'index' => Pages\ListResumes::route('/'),
+            'create' => Pages\CreateResume::route('/create'),
+            'edit' => Pages\EditResume::route('/{record}/edit'),
         ];
     }
 }
