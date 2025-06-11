@@ -28,7 +28,6 @@ class AppServiceProvider extends ServiceProvider
             UserProfile::class,
         ]);
         FilamentAsset::register([
-            Assets\Css::make('app', Vite::asset('resources/scss/app.scss')),
             Assets\Js::make('app', Vite::asset('resources/js/app.js')),
         ]);
     }
