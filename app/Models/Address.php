@@ -10,7 +10,8 @@ class Address extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'value',
+        'city',
+        'location',
     ];
 
     public function addressable()

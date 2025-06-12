@@ -25,6 +25,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     public $skills;
     public $location;
     public $addresses;
+    public $courses;
 
     public function getBreadcrumbs(): array
     {
@@ -40,12 +41,12 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
         $this->name = $user->name;
         $this->email = $user->email;
         $this->introduction = $user->introduction;
-        $this->location = $user->location;
         $this->position = $user->position;
-        $this->addresses = $user->addresses()->get()->map(fn($x) => ['value' => $x->value])->toArray();
-        $this->phones = $user->phones()->get()->map(fn($x) => ['value' => $x->value])->toArray();
-        $this->links = $user->links()->get()->map(fn($x) => ['value' => $x->value, 'name' => $x->name])->toArray();
-        $this->skills = $user->skills()->get()->map(fn($x) => ['value' => $x->value, 'type' => $x->type])->toArray();
+        $this->phones = $user->phones()->get()?->toArray() ?? [];
+        $this->addresses = $user->addresses()->get()?->toArray() ?? [];
+        $this->links = $user->links()->get()?->toArray();
+        $this->skills = $user->skills()->get()?->toArray();
+        $this->courses = $user->courses()->get()?->toArray();
     }
 
     protected function getFormSchema(): array
@@ -58,15 +59,17 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                     Forms\Components\Textarea::make('introduction'),
                 ]),
                 Forms\Components\Tabs\Tab::make('Addresses')->schema([
-                    Forms\Components\Repeater::make('addresses')->hiddenLabel()->simple(
-                        Forms\Components\TextInput::make('value')->required()
-                    )->reorderableWithDragAndDrop(false),
+                    Forms\Components\Repeater::make('addresses')->hiddenLabel()->schema([
+                        Forms\Components\TextInput::make('location')->required(),
+                        Forms\Components\TextInput::make('city')->required(),
+                    ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
                 Forms\Components\Tabs\Tab::make('Contact')->schema([
                     Forms\Components\TextInput::make('email')->email()->required()->disabled()->label('E-mail'),
-                    Forms\Components\Repeater::make('phones')->simple(
-                        Forms\Components\TextInput::make('value')->required()
-                    )->reorderableWithDragAndDrop(false),
+                    Forms\Components\Repeater::make('phones')->schema([
+                        Forms\Components\TextInput::make('type')->required(),
+                        Forms\Components\TextInput::make('number')->required(),
+                    ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
                 Forms\Components\Tabs\Tab::make('Websites')->schema([
                     Forms\Components\Repeater::make('links')->hiddenLabel()->schema([
@@ -79,7 +82,15 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                         Forms\Components\TextInput::make('type')->required(),
                         Forms\Components\TagsInput::make('value')->label("Skills")->required()->placeholder("Add a skill"),
                     ])->columns(2)->reorderableWithDragAndDrop(false)
-                ])
+                ]),
+                Forms\Components\Tabs\Tab::make('Education')->schema([
+                    Forms\Components\Repeater::make('courses')->hiddenLabel()->schema([
+                        Forms\Components\TextInput::make('name')->required(),
+                        Forms\Components\TextInput::make('instituition')->required(),
+                        Forms\Components\DatePicker::make('start_date')->required(),
+                        Forms\Components\DatePicker::make('end_date'),
+                    ])->columns(2)->reorderableWithDragAndDrop(false),
+                ]),
             ]),
         ];
     }
@@ -88,10 +99,12 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     {
         $data = $this->form->getState();
         $user = Auth::user();
-        $this->syncHasMany($user, 'phones', ['value']);
+        $this->syncHasMany($user, 'phones', ['type', 'number']);
         $this->syncHasMany($user, 'links', ['name', 'value']);
         $this->syncHasMany($user, 'skills', ['type', 'value']);
-        $this->syncHasMany($user, 'addresses', ['value']);
+        $this->syncHasMany($user, 'addresses', ['location', 'city']);
+        $this->syncHasMany($user, 'courses', ['name', 'instituition', 'start_date', 'end_date']);
+        unset($data["email"]);
         $user->update($data);
 
         Notification::make()
@@ -104,11 +117,27 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     {
         $user->$relation()->delete();
 
-        $items = $this->$relation ?? [];
+        $items = data_get($this->form->getState(), $relation, []);
 
-        if (count($items)) {
-            $data = array_map(fn($item) => collect($item)->only($fields)->toArray(), $items);
-            $user->$relation()->createMany($data);
+        if (!count($items)) {
+            return;
         }
+
+        $isMorph = method_exists($user, $relation) && method_exists($user->$relation(), 'getMorphType');
+        $morphType = $isMorph ? $user->$relation()->getMorphType() : null;
+        $morphId = $isMorph ? $user->$relation()->getForeignKeyName() : null;
+
+        $data = array_map(function ($item) use ($fields, $isMorph, $morphType, $morphId, $user) {
+            $base = collect($item)->only($fields)->toArray();
+
+            if ($isMorph) {
+                $base[$morphType] = get_class($user);
+                $base[$morphId] = $user->getKey();
+            }
+
+            return $base;
+        }, $items);
+
+        $user->$relation()->createMany($data);
     }
 }

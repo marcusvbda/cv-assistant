@@ -70,4 +70,9 @@ class User extends Authenticatable
     {
         return $this->morphMany(Address::class, 'addressable');
     }
+
+    public function courses()
+    {
+        return $this->morphMany(Course::class, 'courseable');
+    }
 }
