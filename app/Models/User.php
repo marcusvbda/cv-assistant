@@ -20,8 +20,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'position',
         'password',
-        'location',
         'introduction',
     ];
 
@@ -64,5 +64,10 @@ class User extends Authenticatable
     public function skills()
     {
         return $this->morphMany(Skill::class, 'skillable');
+    }
+
+    public function addresses()
+    {
+        return $this->morphMany(Address::class, 'addressable');
     }
 }
