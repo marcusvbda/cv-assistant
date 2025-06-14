@@ -78,8 +78,8 @@ class User extends Authenticatable
         return $this->morphMany(Course::class, 'courseable');
     }
 
-    public function integrations()
+    public function experiences()
     {
-        return $this->morphMany(Integration::class, 'integratable');
+        return $this->morphMany(Experience::class, 'experienceable');
     }
 }

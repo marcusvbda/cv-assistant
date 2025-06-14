@@ -6,6 +6,7 @@ use App\Services\AIService;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Auth;
+use Carbon\Carbon;
 use Filament\Notifications\Notification;
 
 class UserProfile extends Page implements Forms\Contracts\HasForms
@@ -26,6 +27,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     public $ai_integration;
     public $integrations;
     public $skills;
+    public $experiences;
     public $location;
     public $addresses;
     public $courses;
@@ -53,13 +55,23 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
         $this->addresses = $this->mapRelationToArray($user->addresses(), ['city', 'location']);
         $this->links = $this->mapRelationToArray($user->links(), ['name', 'value']);
         $this->skills = $this->mapRelationToArray($user->skills(), ['type', 'value']);
-        $this->courses = $this->mapRelationToArray($user->courses(), ['instituition', 'start_date', 'end_date', 'name']);
+        $this->courses = $this->mapRelationToArray($user->courses(), ['instituition', 'start_date', 'end_date', 'name'], function ($row) {
+            $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
+            $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
+            return $row;
+        });
+        $this->experiences = $this->mapRelationToArray($user->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
+            $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
+            $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
+            return $row;
+        });
     }
 
-    private function mapRelationToArray($relation, $fieds): array
+    private function mapRelationToArray($relation, $fieds, $callback = null): array
     {
-        return $relation->get()->map(function ($item) use ($fieds) {
-            return collect($item)->only($fieds)->toArray();
+        return $relation->get()->map(function ($item) use ($fieds, $callback) {
+            $values = collect($item)->only($fieds)->toArray();
+            return is_callable($callback) ? $callback($values) : $values;
         })->toArray();
     }
 
@@ -79,8 +91,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                                 $state = $this->form->getState();
                                 unset($state["ai_integration"]);
                                 unset($state["introduction"]);
-                                $service = AIService::make()->system('You write polished, concise first-person resume summaries. Reply ONLY with the summary, no extra text.')
-                                    ->user('You write polished, concise first-person resume summaries.')
+                                $service = AIService::make()->user('You write polished, concise first-person resume summaries. Reply ONLY with the summary in english, no extra text.')
                                     ->user(json_encode($state));
                                 $this->introduction = $service->generate();
                             })
@@ -120,6 +131,32 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                         Forms\Components\DatePicker::make('end_date'),
                     ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
+                Forms\Components\Tabs\Tab::make('Experience')->schema([
+                    Forms\Components\Repeater::make('experiences')->hiddenLabel()->schema([
+                        Forms\Components\Section::make()->schema([
+                            Forms\Components\TextInput::make('position')->required(),
+                            Forms\Components\TextInput::make('company')->required(),
+                            Forms\Components\DatePicker::make('start_date')->required(),
+                            Forms\Components\DatePicker::make('end_date'),
+                        ])->columns(2),
+                        Forms\Components\Textarea::make('description')->rows(5)->required(),
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('fillExperienceWithAI')
+                                ->label('Fill with AI')
+                                ->icon('heroicon-m-sparkles')
+                                ->action(function (array $arguments, Forms\Set $set, Forms\Get $get) {
+                                    $service = AIService::make()->user('You write polished, concise description of a job experience. Reply ONLY with the desciption in english, no extra text.')
+                                        ->user(json_encode([
+                                            'position' => $get('position'),
+                                            'company' => $get('company')
+                                        ]));
+                                    $set('description', $service->generate());
+                                })
+                                ->disabled(fn() => empty(data_get($this->ai_integration ?? [], "key")))
+                        ])
+
+                    ])->reorderableWithDragAndDrop(false),
+                ]),
                 Forms\Components\Tabs\Tab::make('Settings')->schema([
                     Forms\Components\Tabs::make('settings_items')->hiddenLabel()->tabs([
                         Forms\Components\Tabs\Tab::make('AI Integration')->schema([
@@ -149,6 +186,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
         $this->syncHasMany($user, 'skills', ['type', 'value']);
         $this->syncHasMany($user, 'addresses', ['location', 'city']);
         $this->syncHasMany($user, 'courses', ['name', 'instituition', 'start_date', 'end_date']);
+        $this->syncHasMany($user, 'experiences', ['position', 'company', 'description', 'start_date', 'end_date']);
         unset($data["email"]);
         $user->update($data);
 
