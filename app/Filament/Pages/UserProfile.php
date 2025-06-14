@@ -91,7 +91,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                                 $state = $this->form->getState();
                                 unset($state["ai_integration"]);
                                 unset($state["introduction"]);
-                                $service = AIService::make()->user('You write polished, concise first-person resume summaries. Reply ONLY with the summary in english, no extra text.')
+                                $service = AIService::make()->user('You write polished, concise first-person resume summaries without mention companies name. Reply ONLY with the summary in english with around 130 words, no extra text.')
                                     ->user(json_encode($state));
                                 $this->introduction = $service->generate();
                             })
