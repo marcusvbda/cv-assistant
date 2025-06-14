@@ -23,6 +23,8 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     public $introduction;
     public $links;
     public $position;
+    public $ai_integration;
+    public $integrations;
     public $skills;
     public $location;
     public $addresses;
@@ -43,6 +45,10 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
         $this->email = $user->email;
         $this->introduction = $user->introduction;
         $this->position = $user->position;
+        $this->ai_integration = [
+            'provider' => $user->ai_integration->provider ?? null,
+            'key' => $user->ai_integration->key ?? null,
+        ];
         $this->phones = $this->mapRelationToArray($user->phones(), ['type', 'number']);
         $this->addresses = $this->mapRelationToArray($user->addresses(), ['city', 'location']);
         $this->links = $this->mapRelationToArray($user->links(), ['name', 'value']);
@@ -64,19 +70,21 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                 Forms\Components\Tabs\Tab::make('General')->schema([
                     Forms\Components\TextInput::make('name')->required(),
                     Forms\Components\TextInput::make('position'),
-                    Forms\Components\Textarea::make('introduction'),
+                    Forms\Components\Textarea::make('introduction')->rows(5),
                     Forms\Components\Actions::make([
                         Forms\Components\Actions\Action::make('fillIntruductionWithAI')
                             ->label('Fill with AI')
                             ->icon('heroicon-m-sparkles')
                             ->action(function () {
                                 $state = $this->form->getState();
+                                unset($state["ai_integration"]);
                                 unset($state["introduction"]);
                                 $service = AIService::make()->system('You write polished, concise first-person resume summaries. Reply ONLY with the summary, no extra text.')
                                     ->user('You write polished, concise first-person resume summaries.')
                                     ->user(json_encode($state));
                                 $this->introduction = $service->generate();
                             })
+                            ->disabled(fn() => empty(data_get($this->ai_integration ?? [], "key")))
                     ])
                 ]),
                 Forms\Components\Tabs\Tab::make('Addresses')->schema([
@@ -112,6 +120,15 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                         Forms\Components\DatePicker::make('end_date'),
                     ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
+                Forms\Components\Tabs\Tab::make('Integrations')->schema([
+                    Forms\Components\Select::make('ai_integration.provider')
+                        ->options([
+                            'groq' => 'GROQ',
+                            // 'openai' => 'OPENAI',
+                        ]),
+                    Forms\Components\TextInput::make('ai_integration.key')
+                ])->columns(2)
+
             ]),
         ];
     }

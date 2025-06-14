@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('introduction')->nullable()->after("name");
+            $table->longText('introduction')->nullable()->after("name");
             $table->string('position')->nullable()->after("name");
+            $table->jsonb('ai_integration')->nullable()->after("name");
         });
     }
 
@@ -25,6 +26,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('introduction');
             $table->dropColumn('position');
+            $table->dropColumn('ai_integration');
         });
     }
 };

@@ -23,6 +23,7 @@ class User extends Authenticatable
         'position',
         'password',
         'introduction',
+        'ai_integration'
     ];
 
     /**
@@ -47,7 +48,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'phones' => 'array',
             'urls' => 'array',
-            'skills' => 'array'
+            'skills' => 'array',
+            'ai_integration' => 'object'
         ];
     }
 
@@ -74,5 +76,10 @@ class User extends Authenticatable
     public function courses()
     {
         return $this->morphMany(Course::class, 'courseable');
+    }
+
+    public function integrations()
+    {
+        return $this->morphMany(Integration::class, 'integratable');
     }
 }
