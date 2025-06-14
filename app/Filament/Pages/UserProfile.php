@@ -120,15 +120,22 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                         Forms\Components\DatePicker::make('end_date'),
                     ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
-                Forms\Components\Tabs\Tab::make('Integrations')->schema([
-                    Forms\Components\Select::make('ai_integration.provider')
-                        ->options([
-                            'groq' => 'GROQ',
-                            // 'openai' => 'OPENAI',
-                        ]),
-                    Forms\Components\TextInput::make('ai_integration.key')
-                ])->columns(2)
-
+                Forms\Components\Tabs\Tab::make('Settings')->schema([
+                    Forms\Components\Tabs::make('settings_items')->hiddenLabel()->tabs([
+                        Forms\Components\Tabs\Tab::make('AI Integration')->schema([
+                            Forms\Components\Select::make('ai_integration.provider')
+                                ->label('Provider')
+                                ->options([
+                                    'groq' => 'GROQ',
+                                ])
+                                ->required(),
+                            Forms\Components\TextInput::make('ai_integration.key')
+                                ->label('API Key')
+                                ->required()
+                                ->password(),
+                        ])->columns(2),
+                    ])
+                ])
             ]),
         ];
     }
