@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Services\AIService;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Auth;
@@ -42,11 +43,18 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
         $this->email = $user->email;
         $this->introduction = $user->introduction;
         $this->position = $user->position;
-        $this->phones = $user->phones()->get()?->toArray() ?? [];
-        $this->addresses = $user->addresses()->get()?->toArray() ?? [];
-        $this->links = $user->links()->get()?->toArray();
-        $this->skills = $user->skills()->get()?->toArray();
-        $this->courses = $user->courses()->get()?->toArray();
+        $this->phones = $this->mapRelationToArray($user->phones(), ['type', 'number']);
+        $this->addresses = $this->mapRelationToArray($user->addresses(), ['city', 'location']);
+        $this->links = $this->mapRelationToArray($user->links(), ['name', 'value']);
+        $this->skills = $this->mapRelationToArray($user->skills(), ['type', 'value']);
+        $this->courses = $this->mapRelationToArray($user->courses(), ['instituition', 'start_date', 'end_date', 'name']);
+    }
+
+    private function mapRelationToArray($relation, $fieds): array
+    {
+        return $relation->get()->map(function ($item) use ($fieds) {
+            return collect($item)->only($fieds)->toArray();
+        })->toArray();
     }
 
     protected function getFormSchema(): array
@@ -57,6 +65,19 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                     Forms\Components\TextInput::make('name')->required(),
                     Forms\Components\TextInput::make('position'),
                     Forms\Components\Textarea::make('introduction'),
+                    Forms\Components\Actions::make([
+                        Forms\Components\Actions\Action::make('fillIntruductionWithAI')
+                            ->label('Fill with AI')
+                            ->icon('heroicon-m-sparkles')
+                            ->action(function () {
+                                $state = $this->form->getState();
+                                unset($state["introduction"]);
+                                $service = AIService::make()->system('You write polished, concise first-person resume summaries. Reply ONLY with the summary, no extra text.')
+                                    ->user('You write polished, concise first-person resume summaries.')
+                                    ->user(json_encode($state));
+                                $this->introduction = $service->generate();
+                            })
+                    ])
                 ]),
                 Forms\Components\Tabs\Tab::make('Addresses')->schema([
                     Forms\Components\Repeater::make('addresses')->hiddenLabel()->schema([
