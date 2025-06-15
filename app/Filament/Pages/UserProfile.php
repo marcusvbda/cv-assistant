@@ -13,7 +13,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $navigationLabel = 'User Profile';
     protected static string $view = 'filament.pages.user-profile';
     protected static ?string $title = 'Edit User Profile';
@@ -199,7 +199,7 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                             Forms\Components\TextInput::make('ai_integration.key')
                                 ->label('API Key')
                                 ->required()
-                                ->password(),
+                            // ->password(),
                         ])->columns(2),
                     ])
                 ])
@@ -210,6 +210,34 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     public function submit()
     {
         $data = $this->form->getState();
+
+        $ai_integration = data_get($data, 'ai_integration');
+        $provider = data_get($ai_integration, 'provider');
+        $key = data_get($ai_integration, 'key');
+
+        if ($provider && $key) {
+            try {
+                $testKey = uniqid();
+                $service = AIService::make()
+                    ->setProvider($provider)
+                    ->setKey($key)
+                    ->user('Say just "ok"')
+                    ->user("teste[$testKey]");
+
+                $response = $service->generate($key, $provider);
+                if (trim(strtolower($response)) !== 'ok') {
+                    throw new \Exception('Invalid response from AI service');
+                }
+            } catch (\Throwable $e) {
+                Notification::make()
+                    ->title('Invalid API Key')
+                    ->body('The AI Integration Key appears to be invalid: ' . $e->getMessage())
+                    ->danger()
+                    ->send();
+                return;
+            }
+        }
+
         $user = Auth::user();
         $this->syncHasMany($user, 'phones', ['type', 'number']);
         $this->syncHasMany($user, 'links', ['name', 'value']);

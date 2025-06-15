@@ -9,7 +9,7 @@ use Auth;
 
 class Resume extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document';
     protected static ?string $navigationLabel = 'Resume';
     protected static string $view = 'filament.pages.resume';
     protected static ?string $title = 'Your resume';

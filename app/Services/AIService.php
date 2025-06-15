@@ -21,12 +21,24 @@ class AIService
         $user = Auth::user();
         $ai_integration = $user->ai_integration ?? [];
         $this->key = data_get($ai_integration, "key");
-        $this->provider = data_get($ai_integration, "provider");
+        $this->setProvider(data_get($ai_integration, "provider"));
         $this->messages = $messages;
         $this->model = data_get(["groq" => "meta-llama/llama-4-scout-17b-16e-instruct"], $this->provider);
+    }
+
+    public function setProvider($provider): self
+    {
         $this->url = data_get([
             "groq" => "https://api.groq.com/openai/v1"
-        ], $this->provider);
+        ], $provider);
+        $this->provider = $provider;
+        return $this;
+    }
+
+    public function setKey($key): self
+    {
+        $this->key = $key;
+        return $this;
     }
 
     public static function make($messages = []): self
@@ -76,8 +88,8 @@ class AIService
         $cacheKey = $this->getCacheKey();
 
         try {
-            config(['openai.api_key' => $this->key]);
             config(['openai.base_uri' => $this->url]);
+            config(['openai.api_key' => $this->key]);
 
             return Cache::rememberForever($cacheKey, function () {
                 $response = OpenAI::chat()->create($this->getOptions());
