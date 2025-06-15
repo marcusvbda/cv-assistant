@@ -15,7 +15,7 @@
         </tr>';
 @endphp
 
-<table width="100%" cellpadding="0" cellspacing="0" style="font-size:16px; padding:40px; width:100%;">
+<table width="100%" cellpadding="0" cellspacing="0" style="font-size:12px; width:100%;font-family: Arial, sans-serif;">
     <tr>
         <td colspan="2" align="center" style="padding-bottom:50px;">
             <div style="font-size:2rem; font-weight:bold;">{{ $user->name }}</div>
@@ -26,8 +26,8 @@
     </tr>
     <tr>
         @if(count($links))
-            <td valign="top" style="padding-right:20px;">
-               <table>
+            <td style="width:50%;">
+               <table style="width: 100%">
                     @foreach($links as $link)
                         <tr>
                             <td><strong>{{ $link->name }}:</strong></td>
@@ -37,11 +37,11 @@
                </table>
             </td>
         @endif
-        <td valign="top" align="right">
-            <table>
+        <td style="width:50%" align="right">
+            <table style="width: 100%">
                 <tr>
                     <td><strong>Email:</strong></td>
-                    <td style="padding-left: 10px">{{ $user->email }}</td>
+                    <td style="padding-left: 10px;text-align:right">{{ $user->email }}</td>
                 </tr>
                 @foreach($phones as $phone)
                     <tr>
