@@ -194,11 +194,9 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                                 ->label('Provider')
                                 ->options([
                                     'groq' => 'GROQ',
-                                ])
-                                ->required(),
+                                ]),
                             Forms\Components\TextInput::make('ai_integration.key')
                                 ->label('API Key')
-                                ->required()
                             // ->password(),
                         ])->columns(2),
                     ])

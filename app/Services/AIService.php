@@ -10,10 +10,10 @@ class AIService
 {
     private $messages;
     private $provider;
-    private $url;
     private $key;
     private $isJson = false;
     private $jsonFormat;
+    private $model;
     private $temperature = 0.7;
 
     public function __construct($messages)
@@ -23,14 +23,10 @@ class AIService
         $this->key = data_get($ai_integration, "key");
         $this->setProvider(data_get($ai_integration, "provider"));
         $this->messages = $messages;
-        $this->model = data_get(["groq" => "meta-llama/llama-4-scout-17b-16e-instruct"], $this->provider);
     }
 
     public function setProvider($provider): self
     {
-        $this->url = data_get([
-            "groq" => "https://api.groq.com/openai/v1"
-        ], $provider);
         $this->provider = $provider;
         return $this;
     }
@@ -44,12 +40,6 @@ class AIService
     public static function make($messages = []): self
     {
         return new self($messages);
-    }
-
-    public function model($value): self
-    {
-        $this->model = $value;
-        return $this;
     }
 
     public function temperature($value): self
@@ -88,8 +78,12 @@ class AIService
         $cacheKey = $this->getCacheKey();
 
         try {
-            config(['openai.base_uri' => $this->url]);
+            $url = data_get([
+                "groq" => "https://api.groq.com/openai/v1"
+            ], $this->provider);
+            config(['openai.base_uri' => $url]);
             config(['openai.api_key' => $this->key]);
+            $this->model = data_get(["groq" => "meta-llama/llama-4-scout-17b-16e-instruct"], $this->provider);
 
             return Cache::rememberForever($cacheKey, function () {
                 $response = OpenAI::chat()->create($this->getOptions());
@@ -106,7 +100,7 @@ class AIService
         $options = [
             'model' => $this->model,
             'messages' => $this->messages,
-            'temperature' => $this->temperature
+            'temperature' => $this->temperature,
         ];
         if ($this->isJson) {
             $options["response_format"] = ["type" => "json_object"];
@@ -118,6 +112,6 @@ class AIService
 
     private function getCacheKey(): string
     {
-        return 'ai_response_' . md5(json_encode($this->getOptions()));
+        return 'ai_response_' . md5(json_encode($this->getOptions()) . $this->key . $this->provider);
     }
 }
