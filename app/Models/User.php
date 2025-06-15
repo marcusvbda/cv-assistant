@@ -82,4 +82,14 @@ class User extends Authenticatable
     {
         return $this->morphMany(Experience::class, 'experienceable');
     }
+
+    public function projects()
+    {
+        return $this->morphMany(Project::class, 'projectable');
+    }
+
+    public function certificates()
+    {
+        return $this->morphMany(Certificate::class, 'certificateable');
+    }
 }

@@ -28,6 +28,8 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     public $integrations;
     public $skills;
     public $experiences;
+    public $certificates;
+    public $projects;
     public $location;
     public $addresses;
     public $courses;
@@ -63,6 +65,15 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
         $this->experiences = $this->mapRelationToArray($user->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
             $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
             $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
+            return $row;
+        });
+        $this->projects = $this->mapRelationToArray($user->projects(), ['name', 'description', 'start_date', 'end_date'], function ($row) {
+            $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
+            $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
+            return $row;
+        });
+        $this->certificates = $this->mapRelationToArray($user->certificates(), ['name', 'description', 'date'], function ($row) {
+            $row["date"] = @$row["date"] ? Carbon::parse($row["date"])->format('Y-m-d') : null;
             return $row;
         });
     }
@@ -157,6 +168,25 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
 
                     ])->reorderableWithDragAndDrop(false),
                 ]),
+                Forms\Components\Tabs\Tab::make('Projects')->schema([
+                    Forms\Components\Repeater::make('projects')->hiddenLabel()->schema([
+                        Forms\Components\Section::make()->schema([
+                            Forms\Components\TextInput::make('name')->required(),
+                            Forms\Components\DatePicker::make('start_date')->required(),
+                            Forms\Components\DatePicker::make('end_date'),
+                        ])->columns(2),
+                        Forms\Components\Textarea::make('description')->rows(5)->required(),
+                    ])->reorderableWithDragAndDrop(false),
+                ]),
+                Forms\Components\Tabs\Tab::make('Certificates')->schema([
+                    Forms\Components\Repeater::make('certificates')->hiddenLabel()->schema([
+                        Forms\Components\Section::make()->schema([
+                            Forms\Components\TextInput::make('name')->required(),
+                            Forms\Components\DatePicker::make('date')->required(),
+                        ])->columns(2),
+                        Forms\Components\Textarea::make('description')->rows(5)->required(),
+                    ])->reorderableWithDragAndDrop(false),
+                ]),
                 Forms\Components\Tabs\Tab::make('Settings')->schema([
                     Forms\Components\Tabs::make('settings_items')->hiddenLabel()->tabs([
                         Forms\Components\Tabs\Tab::make('AI Integration')->schema([
@@ -187,6 +217,8 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
         $this->syncHasMany($user, 'addresses', ['location', 'city']);
         $this->syncHasMany($user, 'courses', ['name', 'instituition', 'start_date', 'end_date']);
         $this->syncHasMany($user, 'experiences', ['position', 'company', 'description', 'start_date', 'end_date']);
+        $this->syncHasMany($user, 'projects', ['name', 'description', 'start_date', 'end_date']);
+        $this->syncHasMany($user, 'certificates', ['name', 'description', 'date']);
         unset($data["email"]);
         $user->update($data);
 

@@ -1,87 +1,167 @@
 @php
-    $contaier = "display:flex;flex-direction:column;padding:40px;font-size:16px";
-    $row = "display:flex;justify-content:space-between;align-items:center;";
-    $col = "display:flex;flex-direction:column;gap:2px;flex:1;";
-    $separator = '<hr style="margin:15px 0;border-color: #b0b0b0;"/>';
-
+    $user = $user->load(['links', 'phones', 'skills', 'courses']);
     $links = $user->links()->get();
     $phones = $user->phones()->get();
     $skills = $user->skills()->get();
     $courses = $user->courses()->get();
+    $experiences = $user->experiences()->get();
+    $projects = $user->projects()->get();
+    $certificates = $user->certificates()->get();
+    $hr = '<tr><td colspan="2"><hr style="margin:20px 0;border-color:#b0b0b0;"></td></tr>';
+    $header =fn($title) => '<tr>
+            <td colspan="2" align="center">
+                <div style="font-size:1.2rem; font-weight:bold; margin-bottom:20px;">'.$title.'</div>
+            </td>
+        </tr>';
 @endphp
 
-<div style="{{ $contaier }}">
-    <div style="{{ $row }} margin-bottom:40px;justify-content:center">
-        <div style="{{ $col }} align-items:center">
-            <strong style="font-size: 2rem;">{{ $user->name }}</strong>
+<table width="100%" cellpadding="0" cellspacing="0" style="font-size:16px; padding:40px; width:100%;">
+    <tr>
+        <td colspan="2" align="center" style="padding-bottom:50px;">
+            <div style="font-size:2rem; font-weight:bold;">{{ $user->name }}</div>
             @if($user->position)
-                <span style="font-size: 1rem;">{{ $user->position }}</span>
+                <div style="font-size:1rem;">{{ $user->position }}</div>
             @endif
-        </div>
-    </div>
-    <div style="{{ $row }}">
-        <div style="{{ $col }}">
-            @if($links->count())
-                @foreach($links as $link)
-                    <span><strong>{{$link->name}} : </strong>{{ $link->value }}</span>
-                @endforeach
-            @endif
-        </div>
-        <div style="{{ $col }} text-align:right">
-            <span><strong>Email : </strong> {{ $user->email }}</span>
-            @if($phones->count())
+        </td>
+    </tr>
+    <tr>
+        @if(count($links))
+            <td valign="top" style="padding-right:20px;">
+               <table>
+                    @foreach($links as $link)
+                        <tr>
+                            <td><strong>{{ $link->name }}:</strong></td>
+                            <td style="padding-left: 10px">{{ $link->value }}</td>
+                        </tr>
+                    @endforeach
+               </table>
+            </td>
+        @endif
+        <td valign="top" align="right">
+            <table>
+                <tr>
+                    <td><strong>Email:</strong></td>
+                    <td style="padding-left: 10px">{{ $user->email }}</td>
+                </tr>
                 @foreach($phones as $phone)
-                    <span><strong>Phone : </strong>{{ $phone->number }}</span>
+                    <tr>
+                        <td><strong>{{ $phone->type }}:</strong></td>
+                        <td style="padding-left: 10px;text-align:right">{{ $phone->number }}</td>
+                    </tr>
                 @endforeach
-            @endif
-        </div>
-    </div>
+            </table>
+        </td>
+    </tr>
     @if($user->introduction)
-        {!! $separator !!}
-        <div style="{{ $row }}justify-content:center;">
-            <div style="{{ $col }} align-items:center">
-                <strong style="font-size: 1.2rem;margin-bottom: 10px;">Introduction</strong>
-                <div>{{ $user->introduction }}</div>
-            </div>
-        </div>
+        {!! $hr !!}
+        <tr>
+            <td colspan="2" align="center">
+                <div style="font-size:1.2rem; font-weight:bold; margin-bottom:20px;">Introduction</div>
+                <div style="text-align:left; margin-bottom:20px;">{{ $user->introduction }}</div>
+            </td>
+        </tr>
     @endif
     @if($skills->count())
-        {!! $separator !!}
-        <div style="{{ $row }}justify-content:center;">
-            <div style="{{ $col }} align-items:center">
-                <strong style="font-size: 1.2rem;margin-bottom: 10px;">Skills summary</strong>
-            </div>
-        </div>
-        <div style="{{ $row }}">
-           <div style="{{ $col }} gap:10px">
-                @foreach($skills as $skill)
-                    <li style="{{ $row }};align-items:center;gap:10px;justify-content:flex-start;">
-                        <strong>{{ $skill->type }} :</strong>
-                        <div>{{ implode(', ', $skill->value) }}</div>
-                    </li>
-                @endforeach
-           </div>
-        </div>
+        {!! $hr !!}
+        {!! $header('Skills Summary') !!}
+        @foreach($skills as $skill)
+            <tr>
+                <td colspan="2" style="padding-bottom:6px;">
+                    <table>
+                        <tr>
+                            <td><strong>{{ $skill->type }}:</strong></td>
+                            <td style="padding-left: 10px">{{ implode(', ', $skill->value) }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        @endforeach
     @endif
     @if($courses->count())
-        {!! $separator !!}
-        <div style="{{ $row }}justify-content:center;">
-            <div style="{{ $col }} align-items:center">
-                <strong style="font-size: 1.2rem;margin-bottom: 10px;">Education</strong>
-            </div>
-        </div>
-        <div style="{{ $row }}">
-            <div style="{{ $col }} gap:10px">
-                @foreach($courses as $course)
-                   <div>
-                        <div style="{{ $row }}">
-                            <strong>{{ $course->instituition }}</strong>
-                            <span>{{ $course->start_date->format('Y-m-d') }} - {{ !$course->end_date ? 'Present' : $course->end_date->format('Y-m-d') }}</span>
-                        </div>
-                        <div>{{ $course->name }}</div>
-                   </div>
-                @endforeach
-           </div>
-        </div>
+        {!! $hr !!}
+        {!! $header('Education') !!}
+        @foreach($courses as $course)
+            <tr>
+                <td colspan="2" style="padding-bottom:10px;">
+                    <table width="100%">
+                        <tr>
+                            <td width="70%" style="font-weight:bold;">{{ $course->instituition }}</td>
+                            <td align="right">
+                                {{ $course->start_date->format('M Y') }} | 
+                                {{ !$course->end_date ? 'Present' : $course->end_date->format('M Y') }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ $course->name }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        @endforeach
     @endif
-</div>
+    @if($experiences->count())
+        {!! $hr !!}
+        {!! $header('Work Experience') !!}
+        @foreach($experiences as $experience)
+            <tr>
+                <td colspan="2" style="padding-bottom:10px;">
+                    <table width="100%">
+                        <tr>
+                            <td width="70%" style="font-weight:bold;">{{ $experience->position }} | {{ $experience->company }}</td>
+                            <td align="right">
+                                {{ $experience->start_date->format('M Y') }} | 
+                                {{ !$experience->end_date ? 'Present' : $experience->end_date->format('M Y') }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ $experience->description }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        @endforeach
+    @endif
+    @if($projects->count())
+        {!! $hr !!}
+        {!! $header('Projects') !!}
+        @foreach($projects as $project)
+            <tr>
+                <td colspan="2" style="padding-bottom:10px;">
+                    <table width="100%">
+                        <tr>
+                            <td width="70%" style="font-weight:bold;">{{ $project->name }}</td>
+                            <td align="right">
+                                {{ $project->start_date->format('M Y') }} | 
+                                {{ !$project->end_date ? 'Present' : $project->end_date->format('M Y') }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ $project->description }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        @endforeach
+    @endif
+    @if($certificates->count())
+        {!! $hr !!}
+        {!! $header('Certificates') !!}
+        @foreach($certificates as $certificate)
+            <tr>
+                <td colspan="2" style="padding-bottom:10px;">
+                    <table width="100%">
+                        <tr>
+                            <td width="70%" style="font-weight:bold;">{{ $certificate->name }}</td>
+                            <td align="right">
+                                {{ $certificate->date->format('M Y') }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ $certificate->description }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        @endforeach
+    @endif
+</table>
