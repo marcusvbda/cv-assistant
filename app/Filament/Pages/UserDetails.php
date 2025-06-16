@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\User;
 use App\Services\AIService;
 use Filament\Pages\Page;
 use Filament\Forms;
@@ -9,14 +10,14 @@ use Auth;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 
-class UserProfile extends Page implements Forms\Contracts\HasForms
+class UserDetails extends Page implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
-    protected static ?string $navigationLabel = 'User Profile';
-    protected static string $view = 'filament.pages.user-profile';
-    protected static ?string $title = 'Edit User Profile';
+    protected static ?string $navigationLabel = 'User Details';
+    protected static string $view = 'filament.pages.user-details';
+    protected static ?string $title = 'Edit User Details';
 
     public $name;
     public $email;
@@ -33,46 +34,47 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
     public $location;
     public $addresses;
     public $courses;
+    public User $user;
 
     public function getBreadcrumbs(): array
     {
         return [
-            url('/user-profile') => 'User Profile',
+            url('/user-profile') => 'User Details',
             'edit' => 'Edit',
         ];
     }
 
     public function mount(): void
     {
-        $user = Auth::user();
-        $this->name = $user->name;
-        $this->email = $user->email;
-        $this->introduction = $user->introduction;
-        $this->position = $user->position;
+        $this->user = Auth::user();
+        $this->name = $this->user->name;
+        $this->email = $this->user->email;
+        $this->introduction = $this->user->introduction;
+        $this->position = $this->user->position;
         $this->ai_integration = [
-            'provider' => $user->ai_integration->provider ?? null,
-            'key' => $user->ai_integration->key ?? null,
+            'provider' => $this->user->ai_integration->provider ?? null,
+            'key' => $this->user->ai_integration->key ?? null,
         ];
-        $this->phones = $this->mapRelationToArray($user->phones(), ['type', 'number']);
-        $this->addresses = $this->mapRelationToArray($user->addresses(), ['city', 'location']);
-        $this->links = $this->mapRelationToArray($user->links(), ['name', 'value']);
-        $this->skills = $this->mapRelationToArray($user->skills(), ['type', 'value']);
-        $this->courses = $this->mapRelationToArray($user->courses(), ['instituition', 'start_date', 'end_date', 'name'], function ($row) {
+        $this->phones = $this->mapRelationToArray($this->user->phones(), ['type', 'number']);
+        $this->addresses = $this->mapRelationToArray($this->user->addresses(), ['city', 'location']);
+        $this->links = $this->mapRelationToArray($this->user->links(), ['name', 'value']);
+        $this->skills = $this->mapRelationToArray($this->user->skills(), ['type', 'value']);
+        $this->courses = $this->mapRelationToArray($this->user->courses(), ['instituition', 'start_date', 'end_date', 'name'], function ($row) {
             $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
             $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
             return $row;
         });
-        $this->experiences = $this->mapRelationToArray($user->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
+        $this->experiences = $this->mapRelationToArray($this->user->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
             $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
             $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
             return $row;
         });
-        $this->projects = $this->mapRelationToArray($user->projects(), ['name', 'description', 'start_date', 'end_date'], function ($row) {
+        $this->projects = $this->mapRelationToArray($this->user->projects(), ['name', 'description', 'start_date', 'end_date'], function ($row) {
             $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
             $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
             return $row;
         });
-        $this->certificates = $this->mapRelationToArray($user->certificates(), ['name', 'description', 'date'], function ($row) {
+        $this->certificates = $this->mapRelationToArray($this->user->certificates(), ['name', 'description', 'date'], function ($row) {
             $row["date"] = @$row["date"] ? Carbon::parse($row["date"])->format('Y-m-d') : null;
             return $row;
         });
@@ -102,11 +104,11 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                                 $state = $this->form->getState();
                                 unset($state["ai_integration"]);
                                 unset($state["introduction"]);
-                                $service = AIService::make()->user('You write polished, concise first-person resume summaries without mention companies name. Reply ONLY with the summary in english with around 130 words, no extra text.')
+                                $service = AIService::make()->user('You write polished, concise first-person resume summaries otimized to ATS without mention companies name. Reply ONLY with the summary in english with around 130 words, no extra text.')
                                     ->user(json_encode($state));
                                 $this->introduction = $service->generate();
                             })
-                            ->disabled(fn() => empty(data_get($this->ai_integration ?? [], "key")))
+                            ->disabled(fn() => !$this->user->hasAiIntegration())
                     ])
                 ]),
                 Forms\Components\Tabs\Tab::make('Addresses')->schema([
@@ -156,14 +158,14 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                                 ->label('Fill with AI')
                                 ->icon('heroicon-m-sparkles')
                                 ->action(function (array $arguments, Forms\Set $set, Forms\Get $get) {
-                                    $service = AIService::make()->user('You write polished, concise description of a job experience. Reply ONLY with the desciption in english, no extra text.')
+                                    $service = AIService::make()->user('You write polished, concise description of the job experience otimized to ATS. Reply ONLY with the desciption in english, no extra text.')
                                         ->user(json_encode([
                                             'position' => $get('position'),
                                             'company' => $get('company')
                                         ]));
                                     $set('description', $service->generate());
                                 })
-                                ->disabled(fn() => empty(data_get($this->ai_integration ?? [], "key")))
+                                ->disabled(fn() => !$this->user->hasAiIntegration())
                         ])
 
                     ])->reorderableWithDragAndDrop(false),
@@ -197,7 +199,8 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
                                 ]),
                             Forms\Components\TextInput::make('ai_integration.key')
                                 ->label('API Key')
-                            // ->password(),
+                                ->password()
+                                ->revealable()
                         ])->columns(2),
                     ])
                 ])
@@ -236,17 +239,17 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
             }
         }
 
-        $user = Auth::user();
-        $this->syncHasMany($user, 'phones', ['type', 'number']);
-        $this->syncHasMany($user, 'links', ['name', 'value']);
-        $this->syncHasMany($user, 'skills', ['type', 'value']);
-        $this->syncHasMany($user, 'addresses', ['location', 'city']);
-        $this->syncHasMany($user, 'courses', ['name', 'instituition', 'start_date', 'end_date']);
-        $this->syncHasMany($user, 'experiences', ['position', 'company', 'description', 'start_date', 'end_date']);
-        $this->syncHasMany($user, 'projects', ['name', 'description', 'start_date', 'end_date']);
-        $this->syncHasMany($user, 'certificates', ['name', 'description', 'date']);
+        $this->user = Auth::user();
+        $this->syncHasMany('phones', ['type', 'number']);
+        $this->syncHasMany('links', ['name', 'value']);
+        $this->syncHasMany('skills', ['type', 'value']);
+        $this->syncHasMany('addresses', ['location', 'city']);
+        $this->syncHasMany('courses', ['name', 'instituition', 'start_date', 'end_date']);
+        $this->syncHasMany('experiences', ['position', 'company', 'description', 'start_date', 'end_date']);
+        $this->syncHasMany('projects', ['name', 'description', 'start_date', 'end_date']);
+        $this->syncHasMany('certificates', ['name', 'description', 'date']);
         unset($data["email"]);
-        $user->update($data);
+        $this->user->update($data);
 
         Notification::make()
             ->title('Saved successfully')
@@ -254,9 +257,9 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
             ->send();
     }
 
-    private function syncHasMany($user, string $relation, array $fields): void
+    private function syncHasMany(string $relation, array $fields): void
     {
-        $user->$relation()->delete();
+        $this->user->$relation()->delete();
 
         $items = data_get($this->form->getState(), $relation, []);
 
@@ -264,21 +267,21 @@ class UserProfile extends Page implements Forms\Contracts\HasForms
             return;
         }
 
-        $isMorph = method_exists($user, $relation) && method_exists($user->$relation(), 'getMorphType');
-        $morphType = $isMorph ? $user->$relation()->getMorphType() : null;
-        $morphId = $isMorph ? $user->$relation()->getForeignKeyName() : null;
+        $isMorph = method_exists($this->user, $relation) && method_exists($this->user->$relation(), 'getMorphType');
+        $morphType = $isMorph ? $this->user->$relation()->getMorphType() : null;
+        $morphId = $isMorph ? $this->user->$relation()->getForeignKeyName() : null;
 
-        $data = array_map(function ($item) use ($fields, $isMorph, $morphType, $morphId, $user) {
+        $data = array_map(function ($item) use ($fields, $isMorph, $morphType, $morphId) {
             $base = collect($item)->only($fields)->toArray();
 
             if ($isMorph) {
-                $base[$morphType] = get_class($user);
-                $base[$morphId] = $user->getKey();
+                $base[$morphType] = get_class($this->user);
+                $base[$morphId] = $this->user->getKey();
             }
 
             return $base;
         }, $items);
 
-        $user->$relation()->createMany($data);
+        $this->user->$relation()->createMany($data);
     }
 }

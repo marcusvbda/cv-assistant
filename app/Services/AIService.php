@@ -73,6 +73,11 @@ class AIService
         return $this;
     }
 
+    private function getModel(): string
+    {
+        return data_get(["groq" => "meta-llama/llama-4-maverick-17b-128e-instruct"], $this->provider);
+    }
+
     public function generate(): mixed
     {
         $cacheKey = $this->getCacheKey();
@@ -83,7 +88,7 @@ class AIService
             ], $this->provider);
             config(['openai.base_uri' => $url]);
             config(['openai.api_key' => $this->key]);
-            $this->model = data_get(["groq" => "meta-llama/llama-4-scout-17b-16e-instruct"], $this->provider);
+            $this->model = $this->getModel();
 
             return Cache::rememberForever($cacheKey, function () {
                 $response = OpenAI::chat()->create($this->getOptions());
@@ -112,6 +117,6 @@ class AIService
 
     private function getCacheKey(): string
     {
-        return 'ai_response_' . md5(json_encode($this->getOptions()) . $this->key . $this->provider);
+        return 'ai_response_' . md5(json_encode($this->getOptions()) . $this->key . $this->provider . $this->getModel());
     }
 }

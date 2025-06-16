@@ -24,9 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Filament::registerPages([
-            UserProfile::class,
-        ]);
         FilamentAsset::register([
             Assets\Js::make('app', Vite::asset('resources/js/app.js')),
         ]);
