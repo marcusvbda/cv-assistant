@@ -8,11 +8,14 @@
     $projects = $user->projects()->get();
     $certificates = $user->certificates()->get();
     $hr = '<tr><td colspan="2"><hr style="margin:20px 0;border-color:#b0b0b0;"></td></tr>';
-    $header =fn($title) => '<tr>
+    $header = fn($title) => '<tr>
             <td colspan="2" align="center">
                 <div style="font-size:1.2rem; font-weight:bold; margin-bottom:20px;">'.$title.'</div>
             </td>
         </tr>';
+        function cleanUrl($url) {
+            return str_replace('www.', '', str_replace('https://', '', str_replace('http://', '', $url)) );
+        }
 @endphp
 
 <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12px; width:100%;font-family: Arial, sans-serif;">
@@ -28,10 +31,16 @@
         @if(count($links))
             <td style="width:50%;">
                <table style="width: 100%">
+                @if($user->linkedin)
+                    <tr>
+                        <td><strong>Linkedin:</strong></td>
+                        <td style="padding-left: 10px">{{ cleanUrl($user->linkedin) }}</td>
+                    </tr>
+                @endif
                     @foreach($links as $link)
                         <tr>
                             <td><strong>{{ $link->name }}:</strong></td>
-                            <td style="padding-left: 10px">{{ $link->value }}</td>
+                            <td style="padding-left: 10px">{{ cleanUrl($link->url) }}</td>
                         </tr>
                     @endforeach
                </table>

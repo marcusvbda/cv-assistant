@@ -23,7 +23,8 @@ class User extends Authenticatable
         'position',
         'password',
         'introduction',
-        'ai_integration'
+        'ai_integration',
+        'linkedin',
     ];
 
     /**

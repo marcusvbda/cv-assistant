@@ -56,6 +56,9 @@ class ProfileCompletion extends Widget
 
             $sections = [
                 'addresses' => $addresses->count(),
+                'position' => $user->position ? 1 : 0,
+                'linkedin' => $user->linkedin ? 1 : 0,
+                'email' => $user->email ? 1 : 0,
                 'contacts' => $phones->count(),
                 'links' => $links->count(),
                 'skills' => $skills->count(),
@@ -71,6 +74,8 @@ class ProfileCompletion extends Widget
             $dataSource = [
                 "name" => $user->name,
                 "introduction" => $user->introduction,
+                "linkedin" => $user->linkedin,
+                "position" => $user->position,
                 "email" => $user->email,
                 "addresses" => $addresses,
                 "contacts" => $phones,
@@ -83,7 +88,8 @@ class ProfileCompletion extends Widget
             ];
 
             $service = AIService::make()->user('Analyze the data in the note and provide score (0-100) and comment/suggestions (max 200 characters) for generating a CV otimized to ATS.')
-                ->user(json_encode($dataSource));
+                ->user(json_encode($dataSource))
+                ->user("Also let me know about any grammar mistakes and other inconsistencies.");
             $aiScore = $service->json(["comment" => "...", "score" => "..."])->generate();
 
             $score = data_get($aiScore, "score", 0);

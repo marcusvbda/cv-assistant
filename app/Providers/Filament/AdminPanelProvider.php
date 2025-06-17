@@ -4,6 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages as AppPages;
 use App\Filament\Widgets\DashboardMetrics;
+use App\Filament\Widgets\LinkedinAnalysis;
+use App\Filament\Widgets\LinkedinAnalysisa;
 use App\Filament\Widgets\ProfileCompletion;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -47,6 +49,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 DashboardMetrics::class,
                 ProfileCompletion::class,
+                LinkedinAnalysis::class,
             ])
             ->middleware([
                 EncryptCookies::class,

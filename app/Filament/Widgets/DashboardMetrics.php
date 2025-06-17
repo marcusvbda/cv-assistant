@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardMetrics extends StatsOverviewWidget
 {
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 2;
 
     protected function getStats(): array
     {

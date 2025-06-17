@@ -24,9 +24,7 @@
                             </div>
 
                             <div class="text-gray-700 space-y-1 pt-6">
-                                <div class="flex items-center justify-between">
-                                    <h2 class="text-xl font-bold">Quality of information</h2>
-                                </div>
+                                <h2 class="text-xl font-bold">Quality of information</h2>
                                 <p><strong>AI analysis:</strong> {{ $verdict }}</p>
                                 <p><strong>AI score:</strong> <span class="font-semibold">{{ $score }}</span>/100</p>
                             </div>
@@ -41,17 +39,7 @@
                             </div>
                     </div>
                 @else
-                   <div class="flex items-center space-x-3">
-                        <x-filament::icon icon="heroicon-o-exclamation-circle" color="danger" class="h-6"/>
-                        <div>
-                            <p class="text-sm font-medium text-danger-600">
-                                AI Provider Key Missing
-                            </p>
-                            <p class="text-sm text-gray-600">
-                                Please configure your AI provider key to unlock AI-powered features in the system.
-                            </p>
-                        </div>
-                    </div>
+                    @include('filament.alerts.ai-not-configured')
                 @endif
             @endif
         </x-filament::card>

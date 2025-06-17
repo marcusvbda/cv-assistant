@@ -15,6 +15,7 @@ return new class extends Migration
             $table->longText('introduction')->nullable()->after("name");
             $table->string('position')->nullable()->after("name");
             $table->jsonb('ai_integration')->nullable()->after("name");
+            $table->longText('linkedin')->nullable()->after("name");
         });
     }
 
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->dropColumn('introduction');
             $table->dropColumn('position');
             $table->dropColumn('ai_integration');
+            $table->dropColumn('linkedin');
         });
     }
 };
