@@ -7,11 +7,13 @@ use App\Filament\Widgets\DashboardMetrics;
 use App\Filament\Widgets\LinkedinAnalysis;
 use App\Filament\Widgets\LinkedinAnalysisa;
 use App\Filament\Widgets\ProfileCompletion;
+use App\Http\Middleware\mustVerifyMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
+use Filament\Pages\Auth\Register;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -31,9 +33,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('/')
             ->login()
-            // ->registration(Register::class)
-            // ->emailVerification()
+            ->registration(Register::class)
+            ->emailVerification()
             ->passwordReset()
+            ->authMiddleware([
+                mustVerifyMiddleware::class,
+            ])
             ->profile()
             ->colors([
                 'primary' => Color::Amber,

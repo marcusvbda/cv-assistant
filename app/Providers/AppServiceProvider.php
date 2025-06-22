@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Filament\Pages\UserProfile;
-use Filament\Facades\Filament;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Assets;
 use Filament\Support\Facades\FilamentAsset;
