@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\User;
 use App\Services\AIService;
 use Filament\Pages\Page;
+use Filament\Actions;
 use Filament\Forms;
 use Auth;
 use Carbon\Carbon;
@@ -32,6 +33,43 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
             url('/user-profile') => 'User Details',
             'edit' => 'Edit',
         ];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        $actions = [];
+        if ($this->user->hasAiIntegration()) {
+            $actions[] = Actions\Action::make('improveWithAI')
+                ->label('Improve with AI')
+                ->icon('heroicon-m-sparkles')
+                ->action(fn() => $this->processAIImprovement());
+        }
+
+        return $actions;
+    }
+
+    public function processAIImprovement()
+    {
+        $state = $this->formState;
+        unset($state["name"]);
+        unset($state["ai_integration"]);
+        unset($state["email"]);
+
+        $format = collect($state)->map(fn($value) => gettype(($value)))->toArray();
+        $service = AIService::make()
+            ->user('Improve or fix grammatically this dataset values (keep the JSON format) to create a polished, concise first-person resume summary optimized for ATS.')
+            ->user('Required fields: introduction, addresses (location, city), phones (type, number), links (name, value), skills (type, value (array of string)), courses (name, instituition, start_date, end_date), experiences (position, company, description, start_date, end_date), projects (name, description, start_date, end_date), certificates (name, description, date).')
+            ->user('if a field is not present, do not add it (except skills), just improve the existing ones.')
+            ->user(json_encode($state));
+
+        $suggestion = $service->json($format)->generate();
+
+        $this->formState = array_merge($this->formState, $suggestion);
+
+        Notification::make()
+            ->title('Suggestion from AI Service filled, please review and save if you like it.')
+            ->success()
+            ->send();
     }
 
     public function mount(): void
