@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\ResumeController;
+use App\Http\Controllers\PdfController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/resume/{user}/preview', [ResumeController::class, 'stream'])->name('resume.stream');
+Route::get('/resume/{user}/preview', [PdfController::class, 'resumeStream'])->name('resume.stream');
+Route::get('/cover-letter/{user}/preview', [PdfController::class, 'coverLetterStream'])->name('cover-letter.stream');
