@@ -40,7 +40,7 @@
                     @foreach($links as $link)
                         <tr>
                             <td><strong>{{ $link->name }}:</strong></td>
-                            <td style="padding-left: 10px">{{ cleanUrl($link->url) }}</td>
+                            <td style="padding-left: 10px">{{ cleanUrl($link->value) }}</td>
                         </tr>
                     @endforeach
                </table>
