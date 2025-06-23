@@ -285,6 +285,8 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
             ->title('Saved successfully')
             ->success()
             ->send();
+
+        return redirect(static::getUrl());
     }
 
     private function syncHasMany(string $relation, array $fields): void
