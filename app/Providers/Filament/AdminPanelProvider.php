@@ -2,11 +2,8 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages as AppPages;
-use App\Filament\Widgets\DashboardMetrics;
 use App\Filament\Widgets\LinkedinAnalysis;
-use App\Filament\Widgets\LinkedinAnalysisa;
-use App\Filament\Widgets\ProfileCompletion;
+use App\Filament\Widgets\ProfileAnalysisWidget;
 use App\Http\Middleware\mustVerifyMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -36,9 +33,6 @@ class AdminPanelProvider extends PanelProvider
             ->registration(Register::class)
             ->emailVerification()
             ->passwordReset()
-            ->authMiddleware([
-                mustVerifyMiddleware::class,
-            ])
             ->profile()
             ->colors([
                 'primary' => Color::Amber,
@@ -48,13 +42,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
-                AppPages\Resume::class
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                DashboardMetrics::class,
-                ProfileCompletion::class,
                 LinkedinAnalysis::class,
+                ProfileAnalysisWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -69,6 +61,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                mustVerifyMiddleware::class,
             ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AlertNoAiIntegration;
 use App\Models\User;
 use App\Services\AIService;
 use Filament\Pages\Page;
@@ -46,6 +47,13 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
         }
 
         return $actions;
+    }
+
+    public function getHeaderWidgets(): array
+    {
+        return [
+            AlertNoAiIntegration::class,
+        ];
     }
 
     public function processAIImprovement()
