@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\JobDescriptionAnalysisStatusEnum;
 use App\Filament\Resources\JobDescriptionAnalysisResource\Pages;
 use App\Models\JobDescriptionAnalysis;
 use Filament\Forms;
@@ -10,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Auth;
 
 class JobDescriptionAnalysisResource extends Resource
 {
@@ -30,7 +32,8 @@ class JobDescriptionAnalysisResource extends Resource
                         Forms\Components\View::make('filament.components.job-fit-preview')
                             ->visibleOn('view')
                             ->viewData(fn($record) => [
-                                'item' => $record
+                                'item' => $record,
+                                'user' => Auth::user(),
                             ]),
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -71,22 +74,14 @@ class JobDescriptionAnalysisResource extends Resource
             Tables\Columns\TextColumn::make('status')
                 ->label('Status')
                 ->sortable()
-                ->formatStateUsing(function (string $state) {
-                    return ucfirst($state);
-                })
-                ->color(fn(string $state) => match ($state) {
-                    'analysing' => 'primary',
-                    'error' => 'danger',
-                    'completed' => 'success',
-                    default => null,
-                })
+                ->formatStateUsing(fn(string $state) => JobDescriptionAnalysisStatusEnum::from($state)->label())
+                ->color(fn(string $state) => JobDescriptionAnalysisStatusEnum::from($state)->color())
                 ->icons([
-                    'heroicon-o-arrow-path' => fn($state) => $state === 'analysing',
+                    'heroicon-o-arrow-path' => fn($state) => $state === JobDescriptionAnalysisStatusEnum::IN_PROGRESS->name,
                 ])
                 ->extraAttributes(['class' => 'column-animate-spin'])
                 ->iconPosition('after')
                 ->searchable(),
-
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Created At')
                 ->dateTime()
