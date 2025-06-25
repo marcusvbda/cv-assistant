@@ -1,0 +1,1 @@
+<h1>STATUS : {{ $item->status }}</h1>

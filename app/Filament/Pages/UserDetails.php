@@ -236,7 +236,8 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                                 ->label('Provider')
                                 ->options([
                                     'groq' => 'GROQ',
-                                ]),
+                                ])
+                                ->default('groq'),
                             Forms\Components\TextInput::make('ai_integration.key')
                                 ->label('API Key')
                                 ->password()

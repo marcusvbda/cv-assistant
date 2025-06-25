@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Widgets\LinkedinAnalysis;
 use App\Filament\Widgets\ProfileAnalysisWidget;
+use App\Filament\Widgets\RecentJobsAnalysesWidget;
 use App\Http\Middleware\mustVerifyMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -47,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 LinkedinAnalysis::class,
                 ProfileAnalysisWidget::class,
+                RecentJobsAnalysesWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

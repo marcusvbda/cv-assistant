@@ -13,6 +13,7 @@ class ProfileAnalysisWidget extends Widget
 
     protected static string $view = 'filament.widgets.profile-analysis';
     protected int|string|array $columnSpan = 'full';
+    protected static ?int $sort = 2;
     public bool $readyToLoad = false;
 
     public function loadWidget()

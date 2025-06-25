@@ -2381,6 +2381,10 @@ select {
   margin-bottom: 1.25rem;
 }
 
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
 .me-1 {
   margin-inline-end: 0.25rem;
 }
@@ -2395,6 +2399,10 @@ select {
 
 .me-6 {
   margin-inline-end: 1.5rem;
+}
+
+.ml-6 {
+  margin-left: 1.5rem;
 }
 
 .ml-auto {
@@ -2435,18 +2443,6 @@ select {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.ml-8 {
-  margin-left: 2rem;
-}
-
-.ml-6 {
-  margin-left: 1.5rem;
-}
-
-.mb-8 {
-  margin-bottom: 2rem;
 }
 
 .line-clamp-\[--line-clamp\] {
@@ -2694,6 +2690,10 @@ select {
   min-width: 0px;
 }
 
+.min-w-16 {
+  min-width: 4rem;
+}
+
 .min-w-48 {
   min-width: 12rem;
 }
@@ -2712,10 +2712,6 @@ select {
 
 .min-w-\[theme\(spacing\.8\)\] {
   min-width: 2rem;
-}
-
-.min-w-16 {
-  min-width: 4rem;
 }
 
 .\!max-w-2xl {
@@ -3303,12 +3299,6 @@ select {
   margin-left: calc(-2rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
-.space-x-3 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 0;
-  margin-right: calc(0.75rem * var(--tw-space-x-reverse));
-  margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
-}
-
 .space-y-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
@@ -3513,6 +3503,10 @@ select {
   border-color: rgba(var(--gray-200), var(--tw-border-opacity, 1));
 }
 
+.border-gray-200\/70 {
+  border-color: rgba(var(--gray-200), 0.7);
+}
+
 .border-gray-300 {
   --tw-border-opacity: 1;
   border-color: rgba(var(--gray-300), var(--tw-border-opacity, 1));
@@ -3535,10 +3529,6 @@ select {
 
 .border-transparent {
   border-color: transparent;
-}
-
-.border-gray-200\/70 {
-  border-color: rgba(var(--gray-200), 0.7);
 }
 
 .border-t-gray-200 {
@@ -3644,11 +3634,6 @@ select {
 .bg-yellow-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(250 204 21 / var(--tw-bg-opacity, 1));
-}
-
-.bg-red-50 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1));
 }
 
 .\!bg-none {
@@ -4033,6 +4018,11 @@ select {
   letter-spacing: -0.05em;
 }
 
+.text-\[\#D97707\] {
+  --tw-text-opacity: 1;
+  color: rgb(217 119 7 / var(--tw-text-opacity, 1));
+}
+
 .text-custom-400 {
   --tw-text-opacity: 1;
   color: rgba(var(--c-400), var(--tw-text-opacity, 1));
@@ -4101,11 +4091,6 @@ select {
   color: rgba(var(--gray-950), var(--tw-text-opacity, 1));
 }
 
-.text-indigo-600 {
-  --tw-text-opacity: 1;
-  color: rgb(79 70 229 / var(--tw-text-opacity, 1));
-}
-
 .text-primary-400 {
   --tw-text-opacity: 1;
   color: rgba(var(--primary-400), var(--tw-text-opacity, 1));
@@ -4124,15 +4109,6 @@ select {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-.text-\[\#\#D97707\] {
-  color: ##D97707;
-}
-
-.text-\[\#D97707\] {
-  --tw-text-opacity: 1;
-  color: rgb(217 119 7 / var(--tw-text-opacity, 1));
 }
 
 .underline {
@@ -6084,4 +6060,18 @@ input:focus-visible+.\[input\:focus-visible\+\&\]\:ring-gray-950\/10 {
 
 input:focus-visible+.dark\:\[input\:focus-visible\+\&\]\:ring-white\/20:is(.dark *) {
   --tw-ring-color: rgb(255 255 255 / 0.2);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.column-animate-spin svg {
+  animation: spin 1s linear infinite;
 }
