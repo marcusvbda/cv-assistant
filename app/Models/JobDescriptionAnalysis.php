@@ -39,4 +39,9 @@ class JobDescriptionAnalysis extends Model
     {
         return $this->morphTo();
     }
+
+    public function jobApplyDetail()
+    {
+        return $this->hasOne(JobApplyDetail::class);
+    }
 }

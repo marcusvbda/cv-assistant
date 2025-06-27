@@ -78,10 +78,6 @@ class JobDescriptionAnalysisResource extends Resource
                 ->label('Job Title')
                 ->searchable()
                 ->sortable(),
-            Tables\Columns\TextColumn::make('description_type')
-                ->label('Description Type')
-                ->formatStateUsing(fn(string $state): string => @static::$descriptionTypes[$state] ?? $state)
-                ->sortable(),
             Tables\Columns\TextColumn::make('status')
                 ->label('Status')
                 ->sortable()

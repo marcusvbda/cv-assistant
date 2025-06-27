@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\JobDescriptionAnalysisStatusEnum;
 use App\Enums\JobDescriptionAnalysisTypeEnum;
+use App\Models\JobApplyDetail;
 use App\Models\JobDescriptionAnalysis;
 use App\Models\User;
 use App\Services\AIService;
@@ -84,7 +85,7 @@ class ProcessJobDescriptionAnalysisJob implements ShouldQueue
             ->user("Using only the job description and personal details provided, generate two Markdown-formatted fields: 'resume' and 'cover_letter'.")
             ->user("Do not add, invent, or assume any information not present in the input.")
             ->user("If there are any grammar issues in the personal details, fix them automatically in the final output.")
-            ->user("Return only a JSON object with the keys: 'resume' and 'cover_letter', both containing Markdown content.");
+            ->user("Return only a JSON object with the keys: 'resume' and 'cover_letter', both containing Markdown content, percentage_of_fit(0-100 and comment_about_fit.");
 
         $result = $service->json([
             "cover_letter" => "...",
@@ -93,9 +94,14 @@ class ProcessJobDescriptionAnalysisJob implements ShouldQueue
             "comment_about_fit" => "..."
         ])->generate();
 
-        DB::table('job_description_analyses')->where('id', $this->item->id)->update(['status' => JobDescriptionAnalysisStatusEnum::COMPLETED->name]);
+        JobApplyDetail::updateOrCreate(['job_description_analysis_id' => $this->item->id], [
+            'resume' => data_get($result, 'resume', ''),
+            'cover_letter' => data_get($result, 'cover_letter', ''),
+            'percentage_fit' => data_get($result, 'percentage_of_fit', 0),
+            'comment' => data_get($result, 'comment_about_fit', ''),
+        ]);
 
-        dd($result);
+        DB::table('job_description_analyses')->where('id', $this->item->id)->update(['status' => JobDescriptionAnalysisStatusEnum::COMPLETED->name]);
     }
 
     private function getJobDescriptionText()
