@@ -13,7 +13,7 @@ export default {
         'text-red-400',
         'bg-green-500',
         'bg-yellow-400',
-        'bg-red-400',
+        'bg-red-400'
     ]
 }
 
