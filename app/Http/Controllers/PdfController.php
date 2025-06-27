@@ -28,7 +28,9 @@ class PdfController extends Controller
         ]);
 
         $html = $converter->convert($mdContent)->getContent();
-        $pdf = Pdf::loadHTML($html)->setPaper('a4');
+        $renderedHtml = view('pdf.markdown-wrapper', ['html' => $html])->render();
+
+        $pdf = Pdf::loadHTML($renderedHtml)->setPaper('a4');
         $user = Auth::user();
         $options = [
             "cover_letter" => "Cover Letter",
