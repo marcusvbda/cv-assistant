@@ -6,7 +6,7 @@ use Filament\Widgets\Widget;
 use Auth;
 use Filament\Widgets\Concerns\CanPoll;
 
-class AlertNoAiIntegration extends Widget
+class AlertNoAiIntegrationWidget extends Widget
 {
     use CanPoll;
 

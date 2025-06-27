@@ -7,7 +7,7 @@ use Filament\Widgets\Widget;
 use Auth;
 use Filament\Widgets\Concerns\CanPoll;
 
-class LinkedinAnalysis extends Widget
+class LinkedinAnalysisWidget extends Widget
 {
     use CanPoll;
 

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\AlertNoAiIntegration;
 use App\Models\User;
 use App\Services\AIService;
 use Filament\Pages\Page;
@@ -49,13 +48,6 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
         return $actions;
     }
 
-    public function getHeaderWidgets(): array
-    {
-        return [
-            AlertNoAiIntegration::class,
-        ];
-    }
-
     public function processAIImprovement()
     {
         $state = $this->formState;
@@ -93,38 +85,30 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                 'provider' => $this->user->ai_integration->provider ?? null,
                 'key' => $this->user->ai_integration->key ?? null,
             ],
-            'phones' => $this->mapRelationToArray($this->user->phones(), ['type', 'number']),
-            'addresses' => $this->mapRelationToArray($this->user->addresses(), ['city', 'location']),
-            'links' =>  $this->mapRelationToArray($this->user->links(), ['name', 'value']),
-            'skills' => $this->mapRelationToArray($this->user->skills(), ['type', 'value']),
-            'courses' => $this->mapRelationToArray($this->user->courses(), ['instituition', 'start_date', 'end_date', 'name'], function ($row) {
+            'phones' => User::mapRelationToArray($this->user->phones(), ['type', 'number']),
+            'addresses' => User::mapRelationToArray($this->user->addresses(), ['city', 'location']),
+            'links' =>  User::mapRelationToArray($this->user->links(), ['name', 'value']),
+            'skills' => User::mapRelationToArray($this->user->skills(), ['type', 'value']),
+            'courses' => User::mapRelationToArray($this->user->courses(), ['instituition', 'start_date', 'end_date', 'name'], function ($row) {
                 $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
                 $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
                 return $row;
             }),
-            'experiences' =>  $this->mapRelationToArray($this->user->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
+            'experiences' =>  User::mapRelationToArray($this->user->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
                 $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
                 $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
                 return $row;
             }),
-            'projects' => $this->mapRelationToArray($this->user->projects(), ['name', 'description', 'start_date', 'end_date'], function ($row) {
+            'projects' => User::mapRelationToArray($this->user->projects(), ['name', 'description', 'start_date', 'end_date'], function ($row) {
                 $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
                 $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
                 return $row;
             }),
-            'certificates' => $this->mapRelationToArray($this->user->certificates(), ['name', 'description', 'date'], function ($row) {
+            'certificates' => User::mapRelationToArray($this->user->certificates(), ['name', 'description', 'date'], function ($row) {
                 $row["date"] = @$row["date"] ? Carbon::parse($row["date"])->format('Y-m-d') : null;
                 return $row;
             })
         ];
-    }
-
-    private function mapRelationToArray($relation, $fieds, $callback = null): array
-    {
-        return $relation->get()->map(function ($item) use ($fieds, $callback) {
-            $values = collect($item)->only($fieds)->toArray();
-            return is_callable($callback) ? $callback($values) : $values;
-        })->toArray();
     }
 
     protected function getFormSchema(): array

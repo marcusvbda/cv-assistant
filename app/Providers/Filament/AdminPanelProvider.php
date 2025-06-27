@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\LinkedinAnalysis;
+use App\Filament\Widgets\LinkedinAnalysisWidget;
 use App\Filament\Widgets\ProfileAnalysisWidget;
 use App\Filament\Widgets\RecentJobsAnalysesWidget;
 use App\Http\Middleware\mustVerifyMiddleware;
@@ -47,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                LinkedinAnalysis::class,
+                LinkedinAnalysisWidget::class,
                 ProfileAnalysisWidget::class,
                 RecentJobsAnalysesWidget::class,
             ])

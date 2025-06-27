@@ -11,6 +11,7 @@ class AIService
     private $messages;
     private $provider;
     private $key;
+    private $user;
     private $isJson = false;
     private $jsonFormat;
     private $model;
@@ -18,11 +19,23 @@ class AIService
 
     public function __construct($messages)
     {
-        $user = Auth::user();
-        $ai_integration = $user->ai_integration ?? [];
+        $this->user = Auth::user();
+        $this->bootstrap();
+        $this->messages = $messages;
+    }
+
+    private function bootstrap()
+    {
+        $ai_integration = $this->user->ai_integration ?? [];
         $this->key = data_get($ai_integration, "key");
         $this->setProvider(data_get($ai_integration, "provider"));
-        $this->messages = $messages;
+    }
+
+    public function setUser($user): self
+    {
+        $this->user = $user;
+        $this->bootstrap();
+        return $this;
     }
 
     public function setProvider($provider): self

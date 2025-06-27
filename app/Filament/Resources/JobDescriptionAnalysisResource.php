@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\JobDescriptionAnalysisStatusEnum;
+use App\Enums\JobDescriptionAnalysisTypeEnum;
 use App\Filament\Resources\JobDescriptionAnalysisResource\Pages;
 use App\Models\JobDescriptionAnalysis;
 use Filament\Forms;
@@ -40,7 +41,12 @@ class JobDescriptionAnalysisResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Select::make('description_type')
                             ->label('Description Type')
-                            ->options(static::$descriptionTypes)
+                            ->options(function () {
+                                $values = JobDescriptionAnalysisTypeEnum::values();
+                                if (Auth::user()->hasAiIntegration()) return $values;
+                                unset($values['JOB_DESCRIPTION_URL']);
+                                return $values;
+                            })
                             ->required()
                             ->default('job_description')
                             ->reactive(),
@@ -48,16 +54,21 @@ class JobDescriptionAnalysisResource extends Resource
                             ->label('Job Description')
                             ->maxLength(5000)
                             ->rows(8)
-                            ->visible(fn(callable $get) => $get('description_type') === 'job_description')
-                            ->required(fn(callable $get) => $get('description_type') === 'job_description'),
+                            ->visible(fn(callable $get) => $get('description_type') === JobDescriptionAnalysisTypeEnum::JOB_DESCRIPTION->name)
+                            ->required(fn(callable $get) => $get('description_type') === JobDescriptionAnalysisTypeEnum::JOB_DESCRIPTION->name),
                         Forms\Components\TextInput::make('description')
                             ->label('Job Description URL')
                             ->url()
                             ->maxLength(2048)
-                            ->visible(fn(callable $get) => $get('description_type') === 'url')
-                            ->required(fn(callable $get) => $get('description_type') === 'url'),
+                            ->visible(fn(callable $get) => $get('description_type') === JobDescriptionAnalysisTypeEnum::JOB_DESCRIPTION_URL->name)
+                            ->required(fn(callable $get) => $get('description_type') === JobDescriptionAnalysisTypeEnum::JOB_DESCRIPTION_URL->name),
                     ]),
             ])->columns(1);
+    }
+
+    protected function getTablePollingInterval(): ?int
+    {
+        return 2000;
     }
 
     public static function getResourceTableCols(): array
@@ -106,7 +117,7 @@ class JobDescriptionAnalysisResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])->poll("5s");
     }
 
     public static function getRelations(): array

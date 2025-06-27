@@ -101,4 +101,12 @@ class User extends Authenticatable implements MustVerifyEmail
         $ai_integration = $user->ai_integration ?? [];
         return boolval(data_get($ai_integration, "key"));
     }
+
+    public static function mapRelationToArray($relation, $fieds, $callback = null): array
+    {
+        return $relation->get()->map(function ($item) use ($fieds, $callback) {
+            $values = collect($item)->only($fieds)->toArray();
+            return is_callable($callback) ? $callback($values) : $values;
+        })->toArray();
+    }
 }
