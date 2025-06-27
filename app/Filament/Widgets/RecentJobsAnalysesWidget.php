@@ -15,13 +15,13 @@ class RecentJobsAnalysesWidget extends BaseWidget
 
     protected function getTableQuery(): Builder
     {
-        return JobDescriptionAnalysis::query()->latest()->limit(5);
+        return JobDescriptionAnalysis::query()->orderBy("id", "desc")->limit(5);
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->query($this->getTableQuery())
-            ->columns(JobDescriptionAnalysisResource::getResourceTableCols());
+            ->columns(JobDescriptionAnalysisResource::getResourceTableCols(false));
     }
 }

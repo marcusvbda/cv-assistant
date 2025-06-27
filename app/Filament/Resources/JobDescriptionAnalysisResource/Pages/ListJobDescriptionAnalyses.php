@@ -13,15 +13,6 @@ class ListJobDescriptionAnalyses extends ListRecords
 {
     protected static string $resource = JobDescriptionAnalysisResource::class;
 
-    protected function getFooterWidgets(): array
-    {
-        return [
-            AlertNoAiIntegrationWidget::class,
-            LinkedinAnalysisWidget::class,
-            ProfileAnalysisWidget::class
-        ];
-    }
-
     protected function getHeaderActions(): array
     {
         return [

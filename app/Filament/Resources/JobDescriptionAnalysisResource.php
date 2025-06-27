@@ -6,6 +6,7 @@ use App\Enums\JobDescriptionAnalysisStatusEnum;
 use App\Enums\JobDescriptionAnalysisTypeEnum;
 use App\Filament\Resources\JobDescriptionAnalysisResource\Pages;
 use App\Models\JobDescriptionAnalysis;
+use App\Tables\Columns\ProgressColumn;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
@@ -30,7 +31,7 @@ class JobDescriptionAnalysisResource extends Resource
             ->schema([
                 Section::make()
                     ->schema([
-                        Forms\Components\View::make('filament.components.job-fit-preview')
+                        Forms\Components\View::make('components.job-fit-preview')
                             ->visibleOn('view')
                             ->viewData(fn($record) => [
                                 'item' => $record,
@@ -71,16 +72,16 @@ class JobDescriptionAnalysisResource extends Resource
         return 2000;
     }
 
-    public static function getResourceTableCols(): array
+    public static function getResourceTableCols($sortable = true): array
     {
         return [
             Tables\Columns\TextColumn::make('name')
                 ->label('Job Title')
                 ->searchable()
-                ->sortable(),
+                ->sortable($sortable),
             Tables\Columns\TextColumn::make('status')
-                ->label('Status')
-                ->sortable()
+                ->label('Fit Calculation Status')
+                ->sortable($sortable)
                 ->formatStateUsing(fn(string $state) => JobDescriptionAnalysisStatusEnum::from($state)->label())
                 ->color(fn(string $state) => JobDescriptionAnalysisStatusEnum::from($state)->color())
                 ->icons([
@@ -89,11 +90,33 @@ class JobDescriptionAnalysisResource extends Resource
                 ->extraAttributes(['class' => 'column-animate-spin'])
                 ->iconPosition('after')
                 ->searchable(),
+            ProgressColumn::make('progress')->getStateUsing(function ($record) {
+                if ($record->status !== JobDescriptionAnalysisStatusEnum::COMPLETED->name) {
+                    return JobDescriptionAnalysisStatusEnum::from($record->status)->description();
+                }
+
+                $details = $record?->jobApplyDetail()?->first();
+                $percentageFit = is_numeric($details?->percentage_fit) ? (int) $details->percentage_fit : 0;
+                $routeResume = route('download.pdf', ['jobApplyDetail' => $details->id, 'type' => 'resume']);
+                $routeCoverLetter = route('download.pdf', ['jobApplyDetail' => $details->id, 'type' => 'cover_letter']);
+                return [
+                    "percentage" => $percentageFit,
+                    "links" => <<<HTML
+                        <div class="text-sm text-gray-600 flex flex-col md:flex-row gap-4">
+                            <a class="text-primary-600" target="_blank" href="$routeResume">Resume</a>
+                            <a class="text-primary-600" target="_blank" href="$routeCoverLetter">Cover letter</a>
+                        </div>
+                    HTML
+                ];
+            })->label('Percentage Fit')->disabledClick(),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->label('Updated At')
+                ->dateTime()
+                ->sortable($sortable),
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Created At')
                 ->dateTime()
-                ->sortable(),
-
+                ->sortable($sortable),
         ];
     }
 
@@ -113,7 +136,8 @@ class JobDescriptionAnalysisResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])->poll("5s");
+            ])->poll("5s")
+            ->defaultSort('id', 'desc');
     }
 
     public static function getRelations(): array

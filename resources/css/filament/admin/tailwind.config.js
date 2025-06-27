@@ -7,4 +7,13 @@ export default {
         './resources/views/filament/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
     ],
+    safelist: [
+        'text-green-500',
+        'text-yellow-400',
+        'text-red-400',
+        'bg-green-500',
+        'bg-yellow-400',
+        'bg-red-400',
+    ]
 }
+
