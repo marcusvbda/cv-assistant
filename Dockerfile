@@ -1,41 +1,34 @@
-# Imagem base com PHP-FPM
-FROM php:8.2-fpm
+FROM php:8.3-apache
 
-# Instala dependências do sistema
+WORKDIR /var/www/html
+
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpng-dev libonig-dev libxml2-dev libzip-dev \
-    libpq-dev libjpeg-dev libfreetype6-dev openssl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libicu-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl pdo_mysql zip exif pcntl bcmath gd
 
-# Instala Composer
+# Copie arquivo de configuração customizado do Apache
+COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
+
+RUN a2enmod rewrite
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Define diretório de trabalho
-WORKDIR /var/www
-
-# Copia arquivos do projeto
 COPY . .
 
-# Garante permissões mínimas antes do Composer
-RUN mkdir -p /var/www/vendor \
- && chmod -R 775 /var/www \
- && chown -R www-data:www-data /var/www
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Instala dependências PHP com Composer
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --verbose
+RUN chown -R www-data:www-data storage bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
 
-# Permissões para pastas de cache e storage
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+EXPOSE 80
 
-# Gera caches e links necessários
-RUN php artisan config:cache \
- && php artisan route:cache \
- && php artisan view:cache \
- && php artisan storage:link
-
-# Expõe a porta usada pelo artisan serve
-EXPOSE 8000
-
-# Comando de inicialização
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["apache2-foreground"]
