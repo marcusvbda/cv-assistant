@@ -11,5 +11,3 @@ services:
     envVars:
       - key: APP_ENV
         value: production
-      - key: APP_KEY
-        value: base64:/1lUQJaQs6tIqxGo8ciDYdLc9fuDZ745B0fcc0LYA/4=
