@@ -7,6 +7,7 @@ use App\Traits\Enum;
 enum JobDescriptionAnalysisStatusEnum
 {
     use Enum;
+
     case PENDING;
     case IN_PROGRESS;
     case COMPLETED;
