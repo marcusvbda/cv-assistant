@@ -1,9 +1,15 @@
 FROM richarvey/nginx-php-fpm:3.1.6
 
+# Copia o projeto todo para dentro do container
 COPY . /var/www/html
+
+# Copia a pasta scripts para /scripts dentro do container (confirme se scripts está na raiz)
 COPY ./scripts /scripts
+
+# Copia o start.sh para raiz do container
 COPY start.sh /start.sh
 
+# Dá permissão de execução para os scripts
 RUN chmod +x /start.sh /scripts/00-laravel-scripts
 
 ENV WEBROOT /var/www/html/public
