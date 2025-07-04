@@ -1,9 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-composer install --no-dev --optimize-autoloader
-php artisan migrate --force
-php artisan db:seed --force
+echo "Running Laravel deploy script..."
+sh /scripts/00-laravel-scripts
 
-# Depois inicia o nginx e php-fpm
-php-fpm -D
-nginx -g "daemon off;"
+echo "Starting nginx + php-fpm..."
+exec /start.sh

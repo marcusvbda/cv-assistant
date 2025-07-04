@@ -1,9 +1,10 @@
 FROM richarvey/nginx-php-fpm:3.1.6
 
-COPY . .
+COPY . /var/www/html
+COPY ./scripts /scripts
 
 COPY start.sh /start.sh
-RUN chmod +x /start.sh
+RUN chmod +x /start.sh /scripts/00-laravel-scripts
 
 ENV WEBROOT /var/www/html/public
 ENV PHP_ERRORS_STDERR 1
