@@ -87,6 +87,8 @@ class ProcessJobDescriptionAnalysisJob implements ShouldQueue
             ->user("If there are any grammar issues in the personal details, fix them automatically in the final output.")
             ->user("Dont hide any personal details in the final output and keep the experiences in order of the most recent ones.")
             ->user("if some section have no information just hide it.")
+            ->user("dont hide experiences and projects descriptions ( just fix the grammar ).")
+            ->user("join certificates and courses together.")
             ->user("format dates to just year and if some item has no end date just put 'present'.")
             ->user("Return only a JSON object with the keys: 'resume' and 'cover_letter', both containing Markdown content with a good design and otimized for ATS, percentage_of_fit(0-100 and comment_about_fit.");
 
