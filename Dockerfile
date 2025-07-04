@@ -19,5 +19,7 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 80
 
-# Roda o composer install na inicialização do container (para Render)
-CMD composer install --no-interaction --prefer-dist --optimize-autoloader && apache2-foreground
+CMD composer install --no-interaction --prefer-dist --optimize-autoloader && \
+    php artisan migrate --force && \
+    php artisan db:seed --force && \
+    apache2-foreground
