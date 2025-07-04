@@ -22,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (env('APP_ENV') == 'production') {
-            $url->forceScheme('https');
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
         }
         FilamentAsset::register([
             Assets\Js::make('app', Vite::asset('resources/js/app.js')),
