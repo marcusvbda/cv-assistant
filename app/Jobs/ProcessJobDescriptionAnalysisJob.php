@@ -85,6 +85,9 @@ class ProcessJobDescriptionAnalysisJob implements ShouldQueue
             ->user("Using only the job description and personal details provided, generate two Markdown-formatted fields: 'resume' and 'cover_letter'.")
             ->user("Do not add, invent, or assume any information not present in the input.")
             ->user("If there are any grammar issues in the personal details, fix them automatically in the final output.")
+            ->user("Dont hide any personal details in the final output and keep the experiences in order of the most recent ones.")
+            ->user("if some section have no information just hide it.")
+            ->user("format dates to just year and if some item has no end date just put 'present'.")
             ->user("Return only a JSON object with the keys: 'resume' and 'cover_letter', both containing Markdown content with a good design and otimized for ATS, percentage_of_fit(0-100 and comment_about_fit.");
 
         $result = $service->json([
