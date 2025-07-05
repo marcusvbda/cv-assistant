@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 LABEL maintainer="Taylor Otwell"
 
-ARG WWWGROUP
+ARG WWWGROUP=1000
 ARG NODE_VERSION=22
 ARG MYSQL_CLIENT="mysql-client"
 ARG POSTGRES_VERSION=17
@@ -11,7 +11,8 @@ WORKDIR /var/www/html
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
-ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=80"
+# Usa variável PORT do Render para servir na porta correta, com fallback 80
+ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php8.3 -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=${PORT:-80}"
 ENV SUPERVISOR_PHP_USER="sail"
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -36,43 +37,36 @@ RUN apt-get update && apt-get upgrade -y \
        php8.3-msgpack php8.3-igbinary php8.3-redis \
        php8.3-memcached php8.3-pcov php8.3-imagick php8.3-xdebug php8.3-swoole \
     && curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
     && apt-get update \
     && apt-get install -y nodejs \
-    && npm install -g npm \
-    && npm install -g pnpm \
-    && npm install -g bun \
+    && npm install -g npm pnpm bun \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /etc/apt/keyrings/yarn.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
     && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/keyrings/pgdg.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update \
-    && apt-get install -y yarn \
-    && apt-get install -y $MYSQL_CLIENT \
-    && apt-get install -y postgresql-client-$POSTGRES_VERSION \
+    && apt-get install -y yarn $MYSQL_CLIENT postgresql-client-$POSTGRES_VERSION \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.3
 
-RUN userdel -r ubuntu
-
-ARG WWWGROUP=1000
-
 RUN groupadd --force -g $WWWGROUP sail \
-    && useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+    && useradd -ms /bin/bash -g $WWWGROUP -u 1337 sail
 
 COPY ./docker/start-container /usr/local/bin/start-container
 COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY ./docker/php.ini /etc/php/8.3/cli/conf.d/99-sail.ini
+
 RUN chmod +x /usr/local/bin/start-container
 
 RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache \
     && chown -R sail:sail storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-EXPOSE 80/tcp
+EXPOSE 80
 
 ENTRYPOINT ["start-container"]
