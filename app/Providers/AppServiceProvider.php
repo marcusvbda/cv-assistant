@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Assets;
 use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 
 class AppServiceProvider extends ServiceProvider
