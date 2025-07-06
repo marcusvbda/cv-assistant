@@ -21,6 +21,16 @@ WORKDIR /var/www/html
 # Copiar arquivos da aplicação
 COPY . .
 
+# Dá permissão para o usuário www-data nas pastas necessárias
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Define o usuário para rodar os processos (opcional, dependendo do seu setup)
+USER www-data
+
+# Copiar arquivos de configuração
+COPY .env .env
+
 # Instalar dependências PHP
 RUN composer install --no-dev --optimize-autoloader
 
@@ -29,14 +39,6 @@ RUN yarn install && yarn build
 
 # Permissões
 RUN chmod -R 775 storage bootstrap/cache
-
-# Gera chave de app, cache de config e migrações
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php artisan key:generate 
-    # &&
-    # \ php artisan migrate --force
 
 # Etapa 2: Setup de supervisord para queue e web server
 FROM base as final
