@@ -18,24 +18,24 @@ RUN npm install -g yarn
 # Diretório de trabalho
 WORKDIR /var/www/html
 
-# Copiar arquivos da aplicação
-COPY . .
+# Copia todo o código para o container
+COPY . /var/www/html
 
-# Dá permissão para o usuário www-data nas pastas necessárias
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Ajusta dono e permissões ANTES do composer install
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/js/filament
 
-# Define o usuário para rodar os processos (opcional, dependendo do seu setup)
+# (Opcional) Troca para o usuário www-data antes do composer install
 USER www-data
 
-# Instalar dependências PHP
+# Instala dependências PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Instalar frontend
-RUN yarn install && yarn build
+# Volta para root se precisar fazer outras operações administrativas
+USER root
 
-# Permissões
-RUN chmod -R 775 storage bootstrap/cache
+# Permissões finais (se quiser reforçar depois do build)
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Etapa 2: Setup de supervisord para queue e web server
 FROM base as final
