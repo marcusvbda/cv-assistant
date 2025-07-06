@@ -28,9 +28,6 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Define o usuário para rodar os processos (opcional, dependendo do seu setup)
 USER www-data
 
-# Copiar arquivos de configuração
-COPY .env .env
-
 # Instalar dependências PHP
 RUN composer install --no-dev --optimize-autoloader
 
