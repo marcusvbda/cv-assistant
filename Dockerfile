@@ -3,9 +3,9 @@ FROM php:8.3-fpm as base
 
 # Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpq-dev libzip-dev libonig-dev \
-    nodejs npm cron supervisor
-
+    git curl zip unzip libpq-dev libzip-dev libonig-dev libicu-dev \
+    nodejs npm cron supervisor && \
+    docker-php-ext-install intl
 # Instalar extensões PHP
 RUN docker-php-ext-install pdo pdo_pgsql mbstring zip
 
@@ -34,8 +34,9 @@ RUN chmod -R 775 storage bootstrap/cache
 RUN php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
-    php artisan key:generate && \
-    php artisan migrate --force
+    php artisan key:generate 
+    # &&
+    # \ php artisan migrate --force
 
 # Etapa 2: Setup de supervisord para queue e web server
 FROM base as final
