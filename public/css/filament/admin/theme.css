@@ -2373,6 +2373,10 @@ select {
   margin-top: -1.75rem;
 }
 
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -2492,6 +2496,11 @@ select {
   display: none;
 }
 
+.size-8 {
+  width: 2rem;
+  height: 2rem;
+}
+
 .h-0 {
   height: 0px;
 }
@@ -2572,8 +2581,32 @@ select {
   height: 100vh;
 }
 
+.h-\[calc\(100vh-300px\)\] {
+  height: calc(100vh - 300px);
+}
+
 .max-h-96 {
   max-height: 24rem;
+}
+
+.max-h-\[600px\] {
+  max-height: 600px;
+}
+
+.max-h-\[100vh\] {
+  max-height: 100vh;
+}
+
+.max-h-\[calc\(100vh-200px\)\] {
+  max-height: calc(100vh - 200px);
+}
+
+.max-h-\[calc\(100vh-400px\)\] {
+  max-height: calc(100vh - 400px);
+}
+
+.max-h-\[calc\(100vh-300px\)\] {
+  max-height: calc(100vh - 300px);
 }
 
 .min-h-\[theme\(spacing\.48\)\] {
@@ -2586,6 +2619,10 @@ select {
 
 .min-h-screen {
   min-height: 100vh;
+}
+
+.min-h-\[600px\] {
+  min-height: 600px;
 }
 
 .w-1 {
@@ -3075,6 +3112,10 @@ select {
 
 .grid-rows-\[1fr_auto_1fr\] {
   grid-template-rows: 1fr auto 1fr;
+}
+
+.grid-rows-\[1fr_auto\] {
+  grid-template-rows: 1fr auto;
 }
 
 .flex-row-reverse {
@@ -3626,6 +3667,11 @@ select {
   background-color: rgb(250 204 21 / var(--tw-bg-opacity, 1));
 }
 
+.bg-red-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity, 1));
+}
+
 .\!bg-none {
   background-image: none !important;
 }
@@ -3779,6 +3825,11 @@ select {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.py-10 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
 }
 
 .pb-4 {
@@ -4136,6 +4187,10 @@ select {
   opacity: 0.7;
 }
 
+.opacity-20 {
+  opacity: 0.2;
+}
+
 .shadow {
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
@@ -4440,6 +4495,11 @@ select {
   background-color: rgba(var(--gray-100), var(--tw-bg-opacity, 1));
 }
 
+.hover\:bg-gray-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgba(var(--gray-200), var(--tw-bg-opacity, 1));
+}
+
 .hover\:bg-gray-400\/10:hover {
   background-color: rgba(var(--gray-400), 0.1);
 }
@@ -4620,6 +4680,10 @@ select {
 .disabled\:text-gray-500:disabled {
   --tw-text-opacity: 1;
   color: rgba(var(--gray-500), var(--tw-text-opacity, 1));
+}
+
+.disabled\:opacity-10:disabled {
+  opacity: 0.1;
 }
 
 .disabled\:opacity-70:disabled {

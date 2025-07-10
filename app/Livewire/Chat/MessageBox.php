@@ -4,15 +4,17 @@ namespace App\Livewire\Chat;
 
 use App\Models\ChatAiThread;
 use App\Services\AIService;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class MessageBox extends Component
 {
-    public $messages = [];
-    public $isProcessingAnswer = false;
+    public array $messages = [];
+    public array $suggestions = [];
+    public Bool $isProcessingAnswer = false;
+    public Int $threadId;
+    public String $newMessage = '';
     private AIService $service;
-    public $threadId;
-    public string $newMessage = '';
     const ANSWER_TYPE_TEXT = '_TEXT_';
     const ANSWER_TYPE_FUNCTION = '_FUNCTION_';
     const ANSWER_TYPE_HTML = '_HTML_';
@@ -20,7 +22,8 @@ class MessageBox extends Component
     public function __construct()
     {
         $this->service = new AIService([]);
-        $threadId = 1;
+        // $threadId = 2;
+        $this->createSuggestions();
         if (!empty($threadId)) {
             $thread = ChatAiThread::findOrFail($threadId);
             $this->messages = $thread?->messages ?? [];
@@ -28,17 +31,26 @@ class MessageBox extends Component
         }
     }
 
-    public function askForAnAnswer()
+    private function createSuggestions(): void
+    {
+        $this->suggestions = [
+            "Say just \"ok\"",
+            "Say hello",
+            "Say hello world",
+        ];
+    }
+
+    public function askForAnAnswer(): void
     {
         $threadId = $this->threadId;
         $this->setServicePayload();
-        $response = $this->service->generate("choices.0.message", "", $this->providerThreadId);
+        $response = $this->service->generate("choices.0.message", "");
         $this->messages[] = ['role' => 'system', 'content' => $this->processAnswer($response)];
         ChatAiThread::where("id", $threadId)->update(["messages" => $this->messages]);
         $this->isProcessingAnswer = false;
     }
 
-    private function setServicePayload()
+    private function setServicePayload(): void
     {
         $provider = $this->service->getProvider();
         $messagesPayload = $this->messages;
@@ -49,24 +61,23 @@ class MessageBox extends Component
         $this->service->setMessages($messagesPayload);
     }
 
-    private function processAnswer($response)
+    private function processAnswer($response): mixed
     {
         return data_get($response, 'content');
     }
 
-    public function createThreadIfNotExists()
+    public function createThreadIfNotExists(): void
     {
         if (empty($this->threadId)) {
             $thread = ChatAiThread::create([
                 'messages' => [],
-                // 'provider_thread_id' => $providerThreadId
             ]);
 
             $this->threadId = $thread->id;
         }
     }
 
-    public function createMessageInThread($text)
+    public function createMessageInThread($text): void
     {
         $this->createThreadIfNotExists();
         $newMessagePayload = [
@@ -78,7 +89,7 @@ class MessageBox extends Component
         $this->newMessage = '';
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.chat.message-box');
     }

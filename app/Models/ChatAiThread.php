@@ -11,7 +11,6 @@ class ChatAiThread extends Model
 
     protected $fillable = [
         'messages',
-        'provider_thread_id'
     ];
 
     public $casts = [

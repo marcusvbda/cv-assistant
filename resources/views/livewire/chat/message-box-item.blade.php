@@ -1,3 +1,3 @@
 <div class="mb-1">
-    <strong>{{data_get($message,'role')}} :</strong> {{ data_get($message,"content") }}
+    <strong>{{ucfirst(data_get($message,"role",""))}} :</strong> {{ data_get($message,"content") }}
 </div>
