@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('chat_ai_threads', function (Blueprint $table) {
             $table->id();
             $table->jsonb('messages');
+            $table->string('provider_thread_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -249,7 +249,7 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                     ->user('Say just "ok"')
                     ->user("test[$testKey]");
 
-                $response = $service->generate($key, $provider);
+                $response = $service->generate();
                 if (trim(strtolower($response)) !== 'ok') {
                     throw new \Exception('Invalid response from AI service');
                 }

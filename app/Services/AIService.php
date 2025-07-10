@@ -79,11 +79,22 @@ class AIService
         return $this;
     }
 
+    public function setMessages($value): self
+    {
+        $this->messages = $value;
+        return $this;
+    }
+
     public function json($format = null): self
     {
         $this->isJson = true;
         if ($format) $this->jsonFormat = $format;
         return $this;
+    }
+
+    public function getProvider()
+    {
+        return $this->provider;
     }
 
     private function getModel(): string
@@ -94,15 +105,42 @@ class AIService
         ], $this->provider);
     }
 
+    public function createThread(): mixed
+    {
+        try {
+            if (in_array($this->provider, ['groq'])) {
+                abort(403, 'Groq threads is not supported yet');
+            }
+
+            $url = $this->getProviderUrl();
+            config(['openai.base_uri' => $url]);
+            config(['openai.api_key' => $this->key]);
+
+            config(['openai.base_uri' => $url]);
+            config(['openai.api_key' => $this->key]);
+            $thread = OpenAI::threads()->create([]);
+            return $thread->id;
+        } catch (\Throwable $e) {
+            return 'invalid AI settings';
+        }
+    }
+
+    private function getProviderUrl()
+    {
+        $url = data_get([
+            "groq" => "https://api.groq.com/openai/v1",
+            "openai" => "https://api.openai.com/v1",
+        ], $this->provider);
+        return $url;
+    }
+
+
     public function generate($responseIndex = 'choices.0.message.content', $cacheKeyPrefix = ''): mixed
     {
         $cacheKey = implode("-", array_filter([$cacheKeyPrefix, $this->getCacheKey(), $responseIndex]));
 
         try {
-            $url = data_get([
-                "groq" => "https://api.groq.com/openai/v1",
-                "openai" => "https://api.openai.com/v1",
-            ], $this->provider);
+            $url = $this->getProviderUrl();
             config(['openai.base_uri' => $url]);
             config(['openai.api_key' => $this->key]);
             $this->model = $this->getModel();
