@@ -105,26 +105,6 @@ class AIService
         ], $this->provider);
     }
 
-    public function createThread(): mixed
-    {
-        try {
-            if (in_array($this->provider, ['groq'])) {
-                abort(403, 'Groq threads is not supported yet');
-            }
-
-            $url = $this->getProviderUrl();
-            config(['openai.base_uri' => $url]);
-            config(['openai.api_key' => $this->key]);
-
-            config(['openai.base_uri' => $url]);
-            config(['openai.api_key' => $this->key]);
-            $thread = OpenAI::threads()->create([]);
-            return $thread->id;
-        } catch (\Throwable $e) {
-            return 'invalid AI settings';
-        }
-    }
-
     private function getProviderUrl()
     {
         $url = data_get([
@@ -146,7 +126,8 @@ class AIService
             $this->model = $this->getModel();
 
             return Cache::rememberForever($cacheKey, function () use ($responseIndex) {
-                $response = OpenAI::chat()->create($this->getOptions());
+                $payload = $this->getOptions();
+                $response = OpenAI::chat()->create($payload);
                 $result = data_get($response, $responseIndex, '');
                 return $this->isJson ? json_decode($result, true) : $result;
             });

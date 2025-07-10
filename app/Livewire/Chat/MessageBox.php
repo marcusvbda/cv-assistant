@@ -12,7 +12,6 @@ class MessageBox extends Component
     public $isProcessingAnswer = false;
     private AIService $service;
     public $threadId;
-    public $providerThreadId;
     public string $newMessage = '';
     const ANSWER_TYPE_TEXT = '_TEXT_';
     const ANSWER_TYPE_FUNCTION = '_FUNCTION_';
@@ -21,12 +20,11 @@ class MessageBox extends Component
     public function __construct()
     {
         $this->service = new AIService([]);
-        $providerThreadId = "thread_hORCr94FxZWd0vE0omvvbuV6";
-        if (!empty($providerThreadId)) {
-            $thread = ChatAiThread::where('provider_thread_id', $providerThreadId)->first();
+        $threadId = 1;
+        if (!empty($threadId)) {
+            $thread = ChatAiThread::findOrFail($threadId);
             $this->messages = $thread?->messages ?? [];
             $this->threadId = $thread?->id;
-            $this->providerThreadId = $providerThreadId;
         }
     }
 
@@ -34,7 +32,7 @@ class MessageBox extends Component
     {
         $threadId = $this->threadId;
         $this->setServicePayload();
-        $response = $this->service->generate("choices.0.message");
+        $response = $this->service->generate("choices.0.message", "", $this->providerThreadId);
         $this->messages[] = ['role' => 'system', 'content' => $this->processAnswer($response)];
         ChatAiThread::where("id", $threadId)->update(["messages" => $this->messages]);
         $this->isProcessingAnswer = false;
@@ -58,15 +56,10 @@ class MessageBox extends Component
 
     public function createThreadIfNotExists()
     {
-        if (empty($this->threadId) || empty($this->providerThreadId)) {
-            $provider = $this->service->getProvider();
-            $providerThreadId = null;
-            if ($provider === 'openai') {
-                $providerThreadId =  $this->providerThreadId ?? $this->service->createThread();
-            }
+        if (empty($this->threadId)) {
             $thread = ChatAiThread::create([
                 'messages' => [],
-                'provider_thread_id' => $providerThreadId
+                // 'provider_thread_id' => $providerThreadId
             ]);
 
             $this->threadId = $thread->id;
