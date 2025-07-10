@@ -247,7 +247,7 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                     ->setProvider($provider)
                     ->setKey($key)
                     ->user('Say just "ok"')
-                    ->user("teste[$testKey]");
+                    ->user("test[$testKey]");
 
                 $response = $service->generate($key, $provider);
                 if (trim(strtolower($response)) !== 'ok') {

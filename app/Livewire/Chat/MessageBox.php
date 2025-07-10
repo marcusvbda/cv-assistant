@@ -14,25 +14,27 @@ class MessageBox extends Component
     public $threadId;
     public string $newMessage = '';
     const ANSWER_TYPE_TEXT = '_TEXT_';
-    const CONTENT_STATUS_PROCESSING = '_PROCESSING_';
 
+    private function makeService()
+    {
+        $messages = $this->messages;
+        $service = new AIService($messages);
+        return $service;
+    }
 
-    public function sendMessageAndGetAnswer($messageUuid)
+    public function askForAnAnswer()
     {
         $threadId = $this->threadId;
-        $messageIndex = array_search($messageUuid, array_column($this->messages, 'uuid'));
-        $message = $this->messages[$messageIndex];
-        $service = AIService::make()->user(data_get($message, 'text'));
-        $messageUuId = data_get($message, 'uuid');
-        $response = $service->generate("choices.0.message", "$threadId-$messageUuId-");
-        $this->messages[$messageIndex]['answer'] = $this->processAnswer($response);
+        $service = $this->makeService();
+        $response = $service->generate("choices.0.message");
+        $this->messages[] = ['role' => 'system', 'content' => $this->processAnswer($response)];
         ChatAiThread::where("id", $threadId)->update(["messages" => $this->messages]);
         $this->isProcessingAnswer = false;
     }
 
     private function processAnswer($response)
     {
-        return ["type" => static::ANSWER_TYPE_TEXT, "content" => data_get($response, 'content')];
+        return data_get($response, 'content');
     }
 
     public function createThreadIfNotExists()
@@ -50,9 +52,8 @@ class MessageBox extends Component
     {
         $this->createThreadIfNotExists();
         $newMessagePayload = [
-            'text' => $text,
-            'uuid' => (string) Str::uuid(),
-            'answer' => static::CONTENT_STATUS_PROCESSING
+            'role' => 'user',
+            'content' => $text,
         ];
         $this->messages[] = $newMessagePayload;
         $this->isProcessingAnswer = true;

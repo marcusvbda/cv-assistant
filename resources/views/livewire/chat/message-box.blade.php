@@ -3,19 +3,12 @@ use App\Livewire\Chat\MessageBox;
 @endphp
 <div>
     <div class="flex-1 overflow-y-auto mb-2">
-        @foreach($messages as $message)
-            <div class="mb-1">
-                <strong>You :</strong> {{ data_get($message,"text") }}
-            </div>
-            @if(data_get($message,"answer") === MessageBox::CONTENT_STATUS_PROCESSING)
-                <div class="mb-1" wire:init="sendMessageAndGetAnswer('{{data_get($message,"uuid")}}')">Processing answer...</div>
-            @endif
-            @if(data_get($message,"answer.type") === MessageBox::ANSWER_TYPE_TEXT)
-                <div class="mb-1">
-                    <strong>AI:</strong> {{ data_get($message,"answer.content") }}
-                </div>
-            @endif
+        @foreach($messages as $key => $value)
+            @livewire('chat.message-box-item', ['message' => $value], key($key))
         @endforeach
+        @if($isProcessingAnswer)
+           <div class="mb-1" wire:init="askForAnAnswer()">Processing answer...</div>
+        @endif
     </div>
     <div>
         <form wire:submit.prevent="createMessageInThread($event.target.message.value)">
