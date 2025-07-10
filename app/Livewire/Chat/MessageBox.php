@@ -15,6 +15,8 @@ class MessageBox extends Component
     public $isProcessingAnswer = false;
     public $threadId;
     public string $newMessage = '';
+    const ANSWER_TYPE_TEXT = 'text';
+    const CONTENT_STATUS_PROCESSING = '_processing_';
 
     public function mount()
     {
@@ -48,7 +50,7 @@ class MessageBox extends Component
             'text' => $text,
             'uuid' => (string) Str::uuid(),
             'thread_id' => $this->threadId,
-            'answer_content' => []
+            'answer_content' => static::CONTENT_STATUS_PROCESSING
         ];
         $this->messages[] = $newMessagePayload;
         $this->isProcessingAnswer = true;
