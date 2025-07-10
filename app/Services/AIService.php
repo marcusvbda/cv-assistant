@@ -94,9 +94,9 @@ class AIService
         ], $this->provider);
     }
 
-    public function generate($cacheKeyPrefix = ''): mixed
+    public function generate($responseIndex = 'choices.0.message.content', $cacheKeyPrefix = ''): mixed
     {
-        $cacheKey = $cacheKeyPrefix . $this->getCacheKey();
+        $cacheKey = implode("-", array_filter([$cacheKeyPrefix, $this->getCacheKey(), $responseIndex]));
 
         try {
             $url = data_get([
@@ -107,9 +107,9 @@ class AIService
             config(['openai.api_key' => $this->key]);
             $this->model = $this->getModel();
 
-            return Cache::rememberForever($cacheKey, function () {
+            return Cache::rememberForever($cacheKey, function () use ($responseIndex) {
                 $response = OpenAI::chat()->create($this->getOptions());
-                $result = data_get($response, "choices.0.message.content", '');
+                $result = data_get($response, $responseIndex, '');
                 return $this->isJson ? json_decode($result, true) : $result;
             });
         } catch (\Throwable $e) {

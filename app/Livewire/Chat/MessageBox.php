@@ -2,43 +2,47 @@
 
 namespace App\Livewire\Chat;
 
-use App\Models\User;
+use App\Models\ChatAiThread;
 use App\Services\AIService;
 use Livewire\Component;
-use Auth;
 use Str;
 
 class MessageBox extends Component
 {
     public $messages = [];
-    public User $user;
     public $isProcessingAnswer = false;
     public $threadId;
     public string $newMessage = '';
-    const ANSWER_TYPE_TEXT = 'text';
-    const CONTENT_STATUS_PROCESSING = '_processing_';
+    const ANSWER_TYPE_TEXT = '_TEXT_';
+    const CONTENT_STATUS_PROCESSING = '_PROCESSING_';
 
-    public function mount()
-    {
-        $this->user = Auth::user();
-    }
 
     public function sendMessageAndGetAnswer($messageUuid)
     {
+        $threadId = $this->threadId;
         $messageIndex = array_search($messageUuid, array_column($this->messages, 'uuid'));
         $message = $this->messages[$messageIndex];
-        $service = AIService::make()->user($message['text']);
-        $threadId = data_get($message, 'thread_id');
-        $messageId = data_get($message, 'uuid');
-        $response = $service->generate("$threadId-$messageId-");
-        $this->messages[$messageIndex]['answer_content'] = ["type" => "text", "content" => $response];
+        $service = AIService::make()->user(data_get($message, 'text'));
+        $messageUuId = data_get($message, 'uuid');
+        $response = $service->generate("choices.0.message", "$threadId-$messageUuId-");
+        $this->messages[$messageIndex]['answer'] = $this->processAnswer($response);
+        ChatAiThread::where("id", $threadId)->update(["messages" => $this->messages]);
         $this->isProcessingAnswer = false;
+    }
+
+    private function processAnswer($response)
+    {
+        return ["type" => static::ANSWER_TYPE_TEXT, "content" => data_get($response, 'content')];
     }
 
     public function createThreadIfNotExists()
     {
         if (empty($this->threadId)) {
-            $this->threadId = (string) Str::uuid();
+            $thread = ChatAiThread::create([
+                'messages' => []
+            ]);
+
+            $this->threadId = $thread->id;
         }
     }
 
@@ -46,11 +50,9 @@ class MessageBox extends Component
     {
         $this->createThreadIfNotExists();
         $newMessagePayload = [
-            'user_id' => $this->user->id,
             'text' => $text,
             'uuid' => (string) Str::uuid(),
-            'thread_id' => $this->threadId,
-            'answer_content' => static::CONTENT_STATUS_PROCESSING
+            'answer' => static::CONTENT_STATUS_PROCESSING
         ];
         $this->messages[] = $newMessagePayload;
         $this->isProcessingAnswer = true;
