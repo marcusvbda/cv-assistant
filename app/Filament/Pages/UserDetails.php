@@ -220,6 +220,7 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                                 ->label('Provider')
                                 ->options([
                                     'groq' => 'GROQ',
+                                    'openai' => 'OpenAI',
                                 ])
                                 ->default('groq'),
                             Forms\Components\TextInput::make('ai_integration.key')

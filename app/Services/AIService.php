@@ -88,16 +88,20 @@ class AIService
 
     private function getModel(): string
     {
-        return data_get(["groq" => "meta-llama/llama-4-maverick-17b-128e-instruct"], $this->provider);
+        return data_get([
+            "groq" => "meta-llama/llama-4-maverick-17b-128e-instruct",
+            "openai" => "gpt-4o-mini"
+        ], $this->provider);
     }
 
-    public function generate(): mixed
+    public function generate($cacheKeyPrefix = ''): mixed
     {
-        $cacheKey = $this->getCacheKey();
+        $cacheKey = $cacheKeyPrefix . $this->getCacheKey();
 
         try {
             $url = data_get([
-                "groq" => "https://api.groq.com/openai/v1"
+                "groq" => "https://api.groq.com/openai/v1",
+                "openai" => "https://api.openai.com/v1",
             ], $this->provider);
             config(['openai.base_uri' => $url]);
             config(['openai.api_key' => $this->key]);
