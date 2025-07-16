@@ -22,8 +22,8 @@ class MessageBox extends Component
     public function __construct()
     {
         $this->service = new AIService([]);
-        // $threadId = 2;
         $this->createSuggestions();
+        $threadId = request()->get("thread");
         if (!empty($threadId)) {
             $thread = ChatAiThread::findOrFail($threadId);
             $this->messages = $thread?->messages ?? [];

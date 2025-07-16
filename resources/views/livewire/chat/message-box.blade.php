@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-2">
-    <div class="flex-1 mb-2 overflow-y-auto min-h-[600px] h-[600px]">
+    <div class="flex-1 mb-2 overflow-y-auto min-h-[500px] h-[500px]">
         @if(count($messages)) 
             @foreach($messages as $key => $value)
                 @livewire('chat.message-box-item', ['message' => $value], key($key))
