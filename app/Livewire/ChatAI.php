@@ -131,20 +131,26 @@ class ChatAI extends Component
     public function loadMore()
     {
         $this->page++;
-        $itemsPaginated = ChatAiThread::orderBy("created_at", "desc")->where("id", "!=", $this->threadId)->paginate($this->perPage, ["*"], "page", $this->page);
+
+        $itemsPaginated = ChatAiThread::where('id', '!=', $this->threadId)
+            ->orderBy('created_at', 'desc')
+            ->paginate($this->perPage, ['*'], 'page', $this->page);
+
         $this->hasMore = $itemsPaginated->hasMorePages();
-        $newItems = $itemsPaginated->toArray()['data'];
-        $currentThread = $this->threadId ? ChatAiThread::where("id", $this->threadId)->get()->toArray() : [];
-        $threads = [];
-        $idsInThreads = [];
-        foreach (array_merge($currentThread, $this->threads, $newItems) as $thread) {
-            if (in_array($thread['id'], $idsInThreads)) {
-                continue;
-            }
-            $idsInThreads[] = $thread['id'];
-            $threads[] = $thread;
-        }
-        $this->threads = $threads;
+
+        $currentThread = $this->threadId
+            ? ChatAiThread::find($this->threadId)
+            : null;
+
+        $allThreads = collect()
+            ->when($currentThread, fn($c) => $c->push($currentThread))
+            ->merge($this->threads)
+            ->merge($itemsPaginated->items())
+            ->unique('id')
+            ->values()
+            ->toArray();
+
+        $this->threads = $allThreads;
     }
 
     public function mount()
