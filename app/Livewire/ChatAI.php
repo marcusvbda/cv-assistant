@@ -19,7 +19,7 @@ class ChatAI extends Component
     private AIService $service;
     public int $page = 0;
     public bool $hasMore;
-    private int $perPage = 9;
+    private int $perPage = 4;
     public array $threads = [];
     public const ANSWER_TYPE_TEXT = '_TEXT_';
     public const ANSWER_TYPE_FUNCTION = '_FUNCTION_';
@@ -135,7 +135,16 @@ class ChatAI extends Component
         $this->hasMore = $itemsPaginated->hasMorePages();
         $newItems = $itemsPaginated->toArray()['data'];
         $currentThread = $this->threadId ? ChatAiThread::where("id", $this->threadId)->get()->toArray() : [];
-        $this->threads = array_merge($currentThread, $this->threads, $newItems);
+        $threads = [];
+        $idsInThreads = [];
+        foreach (array_merge($currentThread, $this->threads, $newItems) as $thread) {
+            if (in_array($thread['id'], $idsInThreads)) {
+                continue;
+            }
+            $idsInThreads[] = $thread['id'];
+            $threads[] = $thread;
+        }
+        $this->threads = $threads;
     }
 
     public function mount()
