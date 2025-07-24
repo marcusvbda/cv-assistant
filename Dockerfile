@@ -1,53 +1,46 @@
-# Etapa 1: Base com PHP 8.3 e dependências
-FROM php:8.3-fpm as base
+FROM php:8.3-fpm
 
-# Instalar dependências do sistema
-RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpq-dev libzip-dev libonig-dev libicu-dev \
-    nodejs npm cron supervisor && \
-    docker-php-ext-install intl
-# Instalar extensões PHP
-RUN docker-php-ext-install pdo pdo_pgsql mbstring zip
+# Atualiza e instala dependências do sistema via apt-get
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    unzip \
+    zip \
+    libzip-dev \
+    libicu-dev \
+    libonig-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    nodejs \
+    npm \
+    curl \
+    bash \
+    build-essential \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Instalar Yarn globalmente
+# Instala yarn globalmente via npm
 RUN npm install -g yarn
 
-# Diretório de trabalho
-WORKDIR /var/www/html
+# Configura e instala extensões PHP necessárias
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) intl pdo pdo_mysql zip bcmath gd
 
-# Copia todo o código para o container
-COPY . /var/www/html
+# Instala Composer copiando do container oficial
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Ajusta dono e permissões ANTES do composer install
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/js/filament
+# Define diretório de trabalho
+WORKDIR /var/www
 
-# (Opcional) Troca para o usuário www-data antes do composer install
-USER www-data
+# Copia o projeto para dentro do container
+COPY . .
 
-# Instala dependências PHP
-RUN composer install --no-dev --optimize-autoloader
+# Ajusta permissões
+RUN chown -R www-data:www-data /var/www
 
-# Volta para root se precisar fazer outras operações administrativas
-USER root
+# Copia o script de entrada
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Permissões finais (se quiser reforçar depois do build)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Etapa 2: Setup de supervisord para queue e web server
-FROM base as final
-
-# Instala servidor web embutido e Supervisor
-RUN echo "* * * * * www-data php /var/www/html/artisan schedule:run >> /dev/null 2>&1" >> /etc/crontab
-
-# Copiar configuração do Supervisor
-COPY ./docker/supervisord.conf /etc/supervisord.conf
-
-# Expõe a porta que o Laravel usará
-EXPOSE 8000
-
-# Inicia supervisord (roda queue e web juntos)
-CMD ["supervisord", "-c", "/etc/supervisord.conf"]
+# Comando de inicialização
+CMD ["/entrypoint.sh"]
