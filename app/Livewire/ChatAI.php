@@ -64,8 +64,9 @@ class ChatAI extends Component
 
     private function processAnswer($response): mixed
     {
+        $content = data_get($response, 'content', '');
         try {
-            $json = json_decode(data_get($response, 'content', ''), true, 512, JSON_THROW_ON_ERROR);
+            $json = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
             if (!isset($json['type']) || !isset($json['content'])) {
                 throw new \Exception("Invalid response format: missing 'type' or 'content'");
             }
@@ -89,7 +90,7 @@ class ChatAI extends Component
         } catch (\Throwable $e) {
             return json_encode([
                 'type' => static::ANSWER_TYPE_TEXT,
-                'content' => "Error processing the response: " . $e->getMessage()
+                'content' => "Error processing the response: " . $e->getMessage() . "\n\n" . $content
             ]);
         }
     }
@@ -263,12 +264,17 @@ class ChatAI extends Component
 
     private function generateCoverLetter(array $params): string
     {
-        $payload = json_encode($params);
-        $userPayload = json_encode(auth()->user()->getPayloadContext());
+        $messagesPayload = json_encode([
+            "requesting_parameters" => $params,
+            "user_info" => auth()->user()->getPayloadContext()
+        ]);
+
         $result = AIService::make()
-            ->system("Based on this information : $payload, generate a good cover letter otimized for this job and ATS.")
-            ->system("Consider this payload about myself : $userPayload")
+            ->system("Based on this information : $messagesPayload, generate a good cover letter otimized for this job and ATS.")
             ->system("Respond only with valid HTML code without any other text.")
+            ->system("NEVER respond a html tag without scaping it and close it properly.")
+            ->system("NEVER respond scripts or styles, If you are responding a styled content use inline styles.")
+            ->system("NEVER include <html>, <head>, <pre>, <body>,```html tags or any full-page HTML structure in the response.")
             ->generate();
 
         return json_encode([
@@ -313,10 +319,12 @@ Valid values for "type" are:
 - NEVER respond with broken, malformed, or incomplete JSON.
 - NEVER include multiple JSON blocks in a single response.
 - NEVER add extra text, markdown, comments, explanations, or newlines before or after the JSON.
-- ALWAYS ensure proper escaping and closing of brackets.
+- ALWAYS ensure proper opening and closing of brackets.
 - NEVER invent or assume unknown function names or parameters.
 - NEVER use "_FUNCTION_" unless the function is explicitly listed and fully applicable.
-- NEVER include <html>, <head>, <body> or any full-page HTML structure in the response.
+- NEVER respond a html tag without scaping it and close it properly.
+- NEVER respond scripts or styles, If you are responding a styled content use inline styles.
+- NEVER include <html>, <head>, <pre>, <body>,```html tags or any full-page HTML structure in the response.
 
 ==================================================
 ✅ FUNCTION USAGE:
