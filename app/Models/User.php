@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -108,5 +109,44 @@ class User extends Authenticatable implements MustVerifyEmail
             $values = collect($item)->only($fieds)->toArray();
             return is_callable($callback) ? $callback($values) : $values;
         })->toArray();
+    }
+
+    public function getPayloadContext(): array
+    {
+        $userArray = $this->toArray();
+
+        unset($userArray['id']);
+        unset($userArray['created_at']);
+        unset($userArray['updated_at']);
+        unset($userArray['ai_integration']);
+        unset($userArray['email_verified_at']);
+
+        $userArray = array_merge($userArray, [
+            'phones' => static::mapRelationToArray($this->phones(), ['type', 'number']),
+            'addresses' => static::mapRelationToArray($this->addresses(), ['city', 'location']),
+            'links' =>  static::mapRelationToArray($this->links(), ['name', 'value']),
+            'skills' => static::mapRelationToArray($this->skills(), ['type', 'value']),
+            'courses' => static::mapRelationToArray($this->courses(), ['instituition', 'start_date', 'end_date', 'name'], function ($row) {
+                $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
+                $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
+                return $row;
+            }),
+            'experiences' =>  static::mapRelationToArray($this->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
+                $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
+                $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
+                return $row;
+            }),
+            'projects' => static::mapRelationToArray($this->projects(), ['name', 'description', 'start_date', 'end_date'], function ($row) {
+                $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
+                $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
+                return $row;
+            }),
+            'certificates' => static::mapRelationToArray($this->certificates(), ['name', 'description', 'date'], function ($row) {
+                $row["date"] = @$row["date"] ? Carbon::parse($row["date"])->format('Y-m-d') : null;
+                return $row;
+            })
+        ]);
+
+        return $userArray;
     }
 }

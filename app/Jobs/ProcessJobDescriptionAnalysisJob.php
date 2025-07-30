@@ -41,46 +41,12 @@ class ProcessJobDescriptionAnalysisJob implements ShouldQueue
         }
 
         $description = $this->getJobDescriptionText();
-        $userArray = $this->user->toArray();
-
-        unset($userArray['id']);
-        unset($userArray['created_at']);
-        unset($userArray['updated_at']);
-        unset($userArray['ai_integration']);
-        unset($userArray['email_verified_at']);
-
-        $userArray = array_merge($userArray, [
-            'phones' => User::mapRelationToArray($this->user->phones(), ['type', 'number']),
-            'addresses' => User::mapRelationToArray($this->user->addresses(), ['city', 'location']),
-            'links' =>  User::mapRelationToArray($this->user->links(), ['name', 'value']),
-            'skills' => User::mapRelationToArray($this->user->skills(), ['type', 'value']),
-            'courses' => User::mapRelationToArray($this->user->courses(), ['instituition', 'start_date', 'end_date', 'name'], function ($row) {
-                $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
-                $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
-                return $row;
-            }),
-            'experiences' =>  User::mapRelationToArray($this->user->experiences(), ['position', 'company', 'description', 'start_date', 'end_date'], function ($row) {
-                $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
-                $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
-                return $row;
-            }),
-            'projects' => User::mapRelationToArray($this->user->projects(), ['name', 'description', 'start_date', 'end_date'], function ($row) {
-                $row["start_date"] = @$row["start_date"] ? Carbon::parse($row["start_date"])->format('Y-m-d') : null;
-                $row["end_date"] = @$row["end_date"] ? Carbon::parse($row["end_date"])->format('Y-m-d')  : null;
-                return $row;
-            }),
-            'certificates' => User::mapRelationToArray($this->user->certificates(), ['name', 'description', 'date'], function ($row) {
-                $row["date"] = @$row["date"] ? Carbon::parse($row["date"])->format('Y-m-d') : null;
-                return $row;
-            })
-        ]);
-
         $service = AIService::make()
             ->setUser($this->user)
             ->user(json_encode([
                 "job_title" => $this->item->name,
                 "job_description" => $description,
-                "person_details" => $userArray
+                "person_details" => $this->user->getPayloadContext(),
             ]))
             ->user("Using only the job description and personal details provided, generate two Markdown-formatted fields: 'resume' and 'cover_letter'.")
             ->user("Do not add, invent, or assume any information not present in the input.")

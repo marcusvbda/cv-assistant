@@ -40,10 +40,9 @@ class ChatAI extends Component
     private function createSuggestions(): void
     {
         $this->suggestions = [
-            "Say just \"ok\"",
-            "Say hello",
-            "Say hello world",
-            "Test",
+            "Analyze my fit to this a description",
+            "Generate a Cover Letter",
+            "Generate a resume (CV)",
         ];
     }
 
@@ -177,41 +176,123 @@ class ChatAI extends Component
     {
         return json_encode([
             [
-                "name" => "getLoremIpsumTestFunction",
-                "description" => "Returns a lorem ipsum test text with current date/time. Use this when the user asks for: test, run test, test message, placeholder content, dummy text, lorem ipsum.",
+                "name" => "getFitToAJobDescription",
+                "description" => "Returns the user's fit with a job position.",
+                "questions_before" => ["Ask to user copy and past the job description in the chat box."],
                 "parameters" => [
                     "type" => "object",
                     "properties" => [
-                        "currentDate" => [
+                        "description" => [
                             "type" => "string",
-                            "description" => "Current date in format YYYY-MM-DD (e.g. 2025-07-18)"
+                            "description" => "Job description provided by the user.",
                         ],
-                        "currentTime" => [
+                        "language" => [
                             "type" => "string",
-                            "description" => "Current time in format HH:MM:SS (e.g. 13:45:00)"
+                            "description" => "Based in this thread language will be used to generate the response.",
                         ],
                     ],
-                    "required" => ["currentDate", "currentTime"]
+                    "required" => ["description", "language"],
+                ]
+            ],
+            [
+                "name" => "generateCoverLetter",
+                "description" => "Generates a Cover Letter based on a job description or not.",
+                "questions_before" => [
+                    "Say to user if he wants to generate a cover letter to a specific job description copy and past the job description in the chat box.",
+                    "Ask if the user wants to specify something else."
+                ],
+                "parameters" => [
+                    "type" => "object",
+                    "properties" => [
+                        "description" => [
+                            "type" => "string",
+                            "description" => "Job description provided by the user.",
+                        ],
+                        "extra_specifications" => [
+                            "type" => "string",
+                            "description" => "Extra specifications provided by the user."
+                        ],
+                        "language" => [
+                            "type" => "string",
+                            "description" => "Based in this thread language will be used to generate the response.",
+                        ]
+                    ],
+                    "required" => ["description", "language"],
+                ]
+            ],
+            [
+                "name" => "generateResume",
+                "description" => "Generates a resume (CV) based on a job description or not.",
+                "questions_before" => [
+                    "Say to user if he wants to generate a resume to a specific job description copy and past the job description in the chat box.",
+                    "Ask if the user wants to specify something else."
+                ],
+                "parameters" => [
+                    "type" => "object",
+                    "properties" => [
+                        "description" => [
+                            "type" => "string",
+                            "description" => "Job description provided by the user.",
+                        ],
+                        "extra_specifications" => [
+                            "type" => "string",
+                            "description" => "Extra specifications provided by the user."
+                        ],
+                        "language" => [
+                            "type" => "string",
+                            "description" => "Based in this thread language will be used to generate the response.",
+                        ]
+                    ],
+                    "required" => ["description", "language"],
                 ]
             ]
-
         ]);
     }
 
-    private function getLoremIpsumTestFunction(array $params): string
+    private function generateResume(array $params): string
     {
-        $currentDate = $params['currentDate'] ?? date("Y-m-d");
-        $currentTime = $params['currentTime'] ?? date("H:i:s");
+        $description = data_get($params, 'description', 'no description provided');
+        $extra_specifications = data_get($params, 'extra_specifications', 'no extra specifications provided');
+        $language = data_get($params, 'language', 'english');
 
         return json_encode([
             "type" => static::ANSWER_TYPE_TEXT,
-            "content" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Current date: {$currentDate}, Current time: {$currentTime}."
+            "content" => "aqui sua $description $extra_specifications $language"
+        ]);
+    }
+
+    private function generateCoverLetter(array $params): string
+    {
+        $payload = json_encode($params);
+        $userPayload = json_encode(auth()->user()->getPayloadContext());
+        $result = AIService::make()
+            ->system("Based on this information : $payload, generate a good cover letter otimized for this job and ATS.")
+            ->system("Consider this payload about myself : $userPayload")
+            ->system("Respond only with valid HTML code without any other text.")
+            ->generate();
+
+        return json_encode([
+            "type" => static::ANSWER_TYPE_HTML,
+            "content" => html_entity_decode($result)
+        ]);
+    }
+
+    private function getFitToAJobDescription(array $params): string
+    {
+        $description = data_get($params, 'description', 'no description provided');
+        $language = data_get($params, 'language', 'english');
+
+        return json_encode([
+            "type" => static::ANSWER_TYPE_TEXT,
+            "content" => "aqui sua $description $language"
         ]);
     }
 
     private function getInitialContext(): array
     {
         $functions = $this->getFunctions();
+        $user = auth()->user();
+        $contextPayload = json_encode($user->getPayloadContext());
 
         return [
             [
@@ -219,6 +300,9 @@ class ChatAI extends Component
                 'content' => <<<EOT
                 You are a strict AI assistant that ONLY responds with valid JSON. Your responses MUST follow this exact format:
 
+                {"type": "_TYPE_", "content": "..."}
+                - TAKE CARE to never respond a broken json (without close brackets properly and scaped) 
+                - ALWAYS respond with valid JSON in the format above.
                 {"type": "_TYPE_", "content": "..."}
 
                 Valid values for "type" JUST are:
@@ -236,6 +320,10 @@ class ChatAI extends Component
                 - If no defined function applies, respond using "_TEXT_" or "_HTML_".
                 - If you are unsure, respond with: {"type": "_TEXT_", "content": "I don't know."}
                 - In case of "_HTML_", use only inline styles.
+                - ONLY use "_FUNCTION_" when:
+                    - The function is listed and applicable;
+                    - All required parameters are available;
+                    - All "questions_before" have been asked and answered;
 
                 ### Functions available for the AI assistant:
                 You may ONLY use "_FUNCTION_" type if one of these functions fully solves the user's request:
@@ -258,12 +346,17 @@ class ChatAI extends Component
                     $functions
 
                 4. If no function is applicable, respond using "_TEXT_" or "_HTML_" depending on context.
+                    4.1. If the function has "questions_before" the AI will have to ask the user these questions before responding with "_FUNCTION_". 
 
                 5. If unsure, respond with:
                 {
                     "type": "_TEXT_",
                     "content": "I don't know."
                 }
+
+                6. To answer all questions in this thread about the user and his(her)(mine) carreer, use this context: $contextPayload"
+
+                7. Call using type _FUNCTION_ only if its necessary. For example, if the user request to translate old answer, use the thread context to answer not regenerate a function response.
 
             EOT
             ],

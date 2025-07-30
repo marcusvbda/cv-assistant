@@ -53,7 +53,7 @@
                         </div>
                         <div class="text-sm">
                             @if (in_array(data_get($decodedContent, 'type'), [ChatAI::ANSWER_TYPE_TEXT, ChatAI::ANSWER_TYPE_HTML]))
-                                {{ data_get($decodedContent, 'content') }}
+                                {!! data_get($decodedContent, 'content') !!}
                             @else 
                                 {{data_get($decodedContent, 'type')}} not implemented
                             @endif
