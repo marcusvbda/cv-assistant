@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('password');
             $table->longText('introduction')->nullable();
             $table->string('position')->nullable();
-            $table->jsonb('ai_integration')->nullable();
             $table->longText('linkedin')->nullable();
             $table->rememberToken();
             $table->timestamps();

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Cache;
 use OpenAI\Laravel\Facades\OpenAI;
 use Auth;
@@ -11,7 +12,6 @@ class AIService
     private $messages;
     private $provider;
     private $key;
-    private $user;
     private $isJson = false;
     private $jsonFormat;
     private $model;
@@ -26,9 +26,9 @@ class AIService
 
     private function bootstrap()
     {
-        $ai_integration = $this->user->ai_integration ?? [];
-        $this->key = data_get($ai_integration, "key");
-        $this->setProvider(data_get($ai_integration, "provider"));
+        $settings = app()->make(GeneralSettings::class);
+        $this->key = $settings->ai_key;
+        $this->setProvider($settings->ai_provider);
     }
 
     public function setUser($user): self

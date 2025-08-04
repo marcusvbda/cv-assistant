@@ -223,23 +223,6 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                         ])->columns(2),
                         Forms\Components\Textarea::make('description')->label(__("Description"))->rows(5)->required(),
                     ])->reorderableWithDragAndDrop(false),
-                ]),
-                Forms\Components\Tabs\Tab::make(__("Settings"))->schema([
-                    Forms\Components\Tabs::make('settings_items')->hiddenLabel()->tabs([
-                        Forms\Components\Tabs\Tab::make(__('AI Integration'))->schema([
-                            Forms\Components\Select::make('ai_integration.provider')
-                                ->label(__("Provider"))
-                                ->options([
-                                    'groq' => 'GROQ',
-                                    'openai' => 'OpenAI',
-                                ])
-                                ->default('groq'),
-                            Forms\Components\TextInput::make('ai_integration.key')
-                                ->label(__('API Key'))
-                                ->password()
-                                ->revealable()
-                        ])->columns(2),
-                    ])
                 ])
             ]),
         ];
@@ -248,31 +231,6 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
     public function submit()
     {
         $ai_integration = data_get($this->formState, 'ai_integration');
-        $provider = data_get($ai_integration, 'provider');
-        $key = data_get($ai_integration, 'key');
-
-        if ($provider && $key) {
-            try {
-                $testKey = uniqid();
-                $service = AIService::make()
-                    ->setProvider($provider)
-                    ->setKey($key)
-                    ->user('Say just "ok"')
-                    ->user("test[$testKey]");
-
-                $response = $service->generate();
-                if (trim(strtolower($response)) !== 'ok') {
-                    throw new \Exception('Invalid response from AI service');
-                }
-            } catch (\Throwable $e) {
-                Notification::make()
-                    ->title('Invalid API Key')
-                    ->body('The AI Integration Key appears to be invalid: ' . $e->getMessage())
-                    ->danger()
-                    ->send();
-                return;
-            }
-        }
 
         $this->user = Auth::user();
         $this->syncHasMany('phones', ['type', 'number']);
