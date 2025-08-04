@@ -144,48 +144,50 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                             ->disabled(fn() => !$this->user->hasAiIntegration())
                     ])
                 ]),
-                Forms\Components\Tabs\Tab::make('Addresses')->schema([
-                    Forms\Components\Repeater::make('addresses')->hiddenLabel()->schema([
-                        Forms\Components\TextInput::make('location')->required(),
-                        Forms\Components\TextInput::make('city')->required(),
-                    ])->columns(2)->reorderableWithDragAndDrop(false),
+                Forms\Components\Tabs\Tab::make(__('Addresses'))->schema([
+                    Forms\Components\Repeater::make('addresses')->hiddenLabel()
+                        ->addActionLabel(__('Add address'))
+                        ->schema([
+                            Forms\Components\TextInput::make('location')->label(__("Location"))->required(),
+                            Forms\Components\TextInput::make('city')->label(__("City"))->required(),
+                        ])->columns(2)->reorderableWithDragAndDrop(false)
                 ]),
-                Forms\Components\Tabs\Tab::make('Contact')->schema([
+                Forms\Components\Tabs\Tab::make(__('Contacts'))->schema([
                     Forms\Components\TextInput::make('email')->email()->required()->disabled()->label('E-mail'),
-                    Forms\Components\Repeater::make('phones')->schema([
-                        Forms\Components\TextInput::make('type')->required(),
-                        Forms\Components\TextInput::make('number')->required(),
+                    Forms\Components\Repeater::make('phones')->label(__("Phones"))->addActionLabel(__('Add phone'))->schema([
+                        Forms\Components\TextInput::make('type')->label(__("Type"))->required(),
+                        Forms\Components\TextInput::make('number')->label(__("Number"))->required(),
                     ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
                 Forms\Components\Tabs\Tab::make('Websites')->schema([
                     Forms\Components\Repeater::make('links')->hiddenLabel()->schema([
-                        Forms\Components\TextInput::make('name')->required(),
+                        Forms\Components\TextInput::make('name')->label(__("Name"))->required(),
                         Forms\Components\TextInput::make('value')->label("Url")->required(),
                     ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
-                Forms\Components\Tabs\Tab::make('Skills')->schema([
-                    Forms\Components\Repeater::make('skills')->hiddenLabel()->schema([
-                        Forms\Components\TextInput::make('type')->required(),
-                        Forms\Components\TagsInput::make('value')->label("Skills")->required()->placeholder("Add a skill"),
+                Forms\Components\Tabs\Tab::make('Skills')->label(__("Skills"))->schema([
+                    Forms\Components\Repeater::make('skills')->addActionLabel(__('Add skill'))->hiddenLabel()->schema([
+                        Forms\Components\TextInput::make('type')->label(__("Type"))->required(),
+                        Forms\Components\TagsInput::make('value')->label(__("Skills"))->required()
                     ])->columns(2)->reorderableWithDragAndDrop(false)
                 ]),
-                Forms\Components\Tabs\Tab::make('Education')->schema([
-                    Forms\Components\Repeater::make('courses')->hiddenLabel()->schema([
-                        Forms\Components\TextInput::make('name')->required(),
-                        Forms\Components\TextInput::make('instituition')->required(),
-                        Forms\Components\DatePicker::make('start_date')->required(),
-                        Forms\Components\DatePicker::make('end_date'),
+                Forms\Components\Tabs\Tab::make('Education')->label(__("Education"))->schema([
+                    Forms\Components\Repeater::make('courses')->hiddenLabel()->addActionLabel(__('Add course'))->schema([
+                        Forms\Components\TextInput::make('name')->label(__("Name"))->required(),
+                        Forms\Components\TextInput::make('instituition')->label(__("Instituition"))->required(),
+                        Forms\Components\DatePicker::make('start_date')->label(__("Start date"))->required(),
+                        Forms\Components\DatePicker::make('end_date')->label(__("End date")),
                     ])->columns(2)->reorderableWithDragAndDrop(false),
                 ]),
-                Forms\Components\Tabs\Tab::make('Experience')->schema([
-                    Forms\Components\Repeater::make('experiences')->hiddenLabel()->schema([
+                Forms\Components\Tabs\Tab::make(__('Experience'))->schema([
+                    Forms\Components\Repeater::make('experiences')->hiddenLabel()->addActionLabel(__('Add experience'))->schema([
                         Forms\Components\Section::make()->schema([
-                            Forms\Components\TextInput::make('position')->required(),
-                            Forms\Components\TextInput::make('company')->required(),
-                            Forms\Components\DatePicker::make('start_date')->required(),
-                            Forms\Components\DatePicker::make('end_date'),
+                            Forms\Components\TextInput::make('position')->label(__("Position"))->required(),
+                            Forms\Components\TextInput::make('company')->label("Company")->required(),
+                            Forms\Components\DatePicker::make('start_date')->label(__("Start date"))->required(),
+                            Forms\Components\DatePicker::make('end_date')->label(__("End date")),
                         ])->columns(2),
-                        Forms\Components\Textarea::make('description')->rows(5)->required(),
+                        Forms\Components\Textarea::make('description')->label(__("Description"))->rows(5)->required(),
                         Forms\Components\Actions::make([
                             Forms\Components\Actions\Action::make('fillExperienceWithAI')
                                 ->label(__("Fill with AI"))
@@ -203,37 +205,37 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
 
                     ])->reorderableWithDragAndDrop(false),
                 ]),
-                Forms\Components\Tabs\Tab::make('Projects')->schema([
-                    Forms\Components\Repeater::make('projects')->hiddenLabel()->schema([
+                Forms\Components\Tabs\Tab::make(__("Projects"))->schema([
+                    Forms\Components\Repeater::make('projects')->addActionLabel(__('Add project'))->hiddenLabel()->schema([
                         Forms\Components\Grid::make()->schema([
-                            Forms\Components\TextInput::make('name')->required(),
-                            Forms\Components\DatePicker::make('start_date')->required(),
-                            Forms\Components\DatePicker::make('end_date'),
+                            Forms\Components\TextInput::make('name')->label(__("Name"))->required(),
+                            Forms\Components\DatePicker::make('start_date')->label(__("Start date"))->required(),
+                            Forms\Components\DatePicker::make('end_date')->label(__("End date")),
                         ])->columns(2),
-                        Forms\Components\Textarea::make('description')->rows(5)->required(),
+                        Forms\Components\Textarea::make('description')->label(__("Description"))->rows(5)->required(),
                     ])->reorderableWithDragAndDrop(false),
                 ]),
-                Forms\Components\Tabs\Tab::make('Certificates')->schema([
-                    Forms\Components\Repeater::make('certificates')->hiddenLabel()->schema([
+                Forms\Components\Tabs\Tab::make(__("Certificates"))->schema([
+                    Forms\Components\Repeater::make('certificates')->addActionLabel(__('Add certificate'))->hiddenLabel()->schema([
                         Forms\Components\Section::make()->schema([
-                            Forms\Components\TextInput::make('name')->required(),
-                            Forms\Components\DatePicker::make('date')->required(),
+                            Forms\Components\TextInput::make('name')->label(__("Name"))->required(),
+                            Forms\Components\DatePicker::make('date')->label(__("Date"))->required(),
                         ])->columns(2),
-                        Forms\Components\Textarea::make('description')->rows(5)->required(),
+                        Forms\Components\Textarea::make('description')->label(__("Description"))->rows(5)->required(),
                     ])->reorderableWithDragAndDrop(false),
                 ]),
-                Forms\Components\Tabs\Tab::make('Settings')->schema([
+                Forms\Components\Tabs\Tab::make(__("Settings"))->schema([
                     Forms\Components\Tabs::make('settings_items')->hiddenLabel()->tabs([
-                        Forms\Components\Tabs\Tab::make('AI Integration')->schema([
+                        Forms\Components\Tabs\Tab::make(__('AI Integration'))->schema([
                             Forms\Components\Select::make('ai_integration.provider')
-                                ->label('Provider')
+                                ->label(__("Provider"))
                                 ->options([
                                     'groq' => 'GROQ',
                                     'openai' => 'OpenAI',
                                 ])
                                 ->default('groq'),
                             Forms\Components\TextInput::make('ai_integration.key')
-                                ->label('API Key')
+                                ->label(__('API Key'))
                                 ->password()
                                 ->revealable()
                         ])->columns(2),
