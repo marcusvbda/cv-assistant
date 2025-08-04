@@ -25,6 +25,16 @@ class JobDescriptionAnalysisResource extends Resource
         'url' => 'Job Description URL',
     ];
 
+    public static function getModelLabel(): string
+    {
+        return __("Job Description Analyse");
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __("Job Description Analyses");
+    }
+
     public static function form(Form $form): Form
     {
         return $form

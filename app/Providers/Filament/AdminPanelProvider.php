@@ -21,6 +21,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use TomatoPHP\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -45,14 +46,6 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->renderHook(
-                'panels::footer',
-                fn(): string => <<<HTML
-                    <a href="https://www.buymeacoffee.com/mvbassalobre" target="_blank" class="p-4 fixed" style="bottom: 0; right: 0;">
-                        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px; width: auto;" />
-                    </a>
-                HTML
-            )
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 LinkedinAnalysisWidget::class,
@@ -73,6 +66,9 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 mustVerifyMiddleware::class,
+            ])
+            ->plugins([
+                FilamentLanguageSwitcherPlugin::make(),
             ]);
     }
 }
