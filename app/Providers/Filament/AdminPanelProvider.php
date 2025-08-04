@@ -4,7 +4,6 @@ namespace App\Providers\Filament;
 
 use App\Filament\Widgets\LinkedinAnalysisWidget;
 use App\Filament\Widgets\ProfileAnalysisWidget;
-use App\Filament\Widgets\RecentJobsAnalysesWidget;
 use App\Http\Middleware\mustVerifyMiddleware;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -21,6 +20,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use TomatoPHP\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('/')
+            ->path('/admin')
             ->login()
             ->registration(Register::class)
             ->emailVerification()
@@ -57,7 +57,6 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 LinkedinAnalysisWidget::class,
                 ProfileAnalysisWidget::class,
-                RecentJobsAnalysesWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -73,6 +72,9 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 mustVerifyMiddleware::class,
+            ])
+            ->plugins([
+                FilamentLanguageSwitcherPlugin::make(),
             ]);
     }
 }

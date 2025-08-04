@@ -16,9 +16,7 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
     use Forms\Concerns\InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
-    protected static ?string $navigationLabel = 'User Details';
     protected static string $view = 'filament.pages.user-details';
-    protected static ?string $title = 'Edit User Details';
 
     public $name;
     public $email;
@@ -27,11 +25,22 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
     public User $user;
     public $formState;
 
+    public function getTitle(): string
+    {
+        return __('User Details');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('Edit User Details');
+    }
+
+
     public function getBreadcrumbs(): array
     {
         return [
-            url('/user-profile') => 'User Details',
-            'edit' => 'Edit',
+            url('/user-profile') => __('User Details'),
+            'edit' => __('Edit')
         ];
     }
 
@@ -115,14 +124,14 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
     {
         return [
             Forms\Components\Tabs::make('User Details')->statePath('formState')->tabs([
-                Forms\Components\Tabs\Tab::make('General')->schema([
-                    Forms\Components\TextInput::make('name')->required(),
-                    Forms\Components\TextInput::make('position'),
+                Forms\Components\Tabs\Tab::make(__('General'))->schema([
+                    Forms\Components\TextInput::make('name')->label(__("Name"))->required(),
+                    Forms\Components\TextInput::make('position')->label(__("Position"))->required(),
                     Forms\Components\TextInput::make('linkedin')->url(),
-                    Forms\Components\Textarea::make('introduction')->rows(5),
+                    Forms\Components\Textarea::make('introduction')->label(__("Introduction"))->rows(5),
                     Forms\Components\Actions::make([
                         Forms\Components\Actions\Action::make('fillIntruductionWithAI')
-                            ->label('Fill with AI')
+                            ->label(__("Fill with AI"))
                             ->icon('heroicon-m-sparkles')
                             ->action(function () {
                                 $state = $this->formState;
@@ -179,7 +188,7 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                         Forms\Components\Textarea::make('description')->rows(5)->required(),
                         Forms\Components\Actions::make([
                             Forms\Components\Actions\Action::make('fillExperienceWithAI')
-                                ->label('Fill with AI')
+                                ->label(__("Fill with AI"))
                                 ->icon('heroicon-m-sparkles')
                                 ->action(function (array $arguments, Forms\Set $set, Forms\Get $get) {
                                     $service = AIService::make()->user('You write polished, concise description of the job experience otimized to ATS. Reply ONLY with the desciption in english, no extra text.')
