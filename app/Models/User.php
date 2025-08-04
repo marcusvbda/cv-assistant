@@ -97,7 +97,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasAiIntegration(): bool
     {
-        return boolval(app()->make(GeneralSettings::class)->ai_provider);
+        return boolval(data_get(app()->make(GeneralSettings::class)->ai, "provider"));
     }
 
     public static function mapRelationToArray($relation, $fieds, $callback = null): array

@@ -15,7 +15,7 @@ class ManagerGeneral extends SettingsPage
 
     public function getTitle(): string
     {
-        return __('Settings');
+        return self::getNavigationLabel();
     }
 
     public static function getNavigationLabel(): string
@@ -27,16 +27,16 @@ class ManagerGeneral extends SettingsPage
     {
         return $form
             ->schema([
-                Forms\Components\Tabs::make('User Details')->tabs([
+                Forms\Components\Tabs::make('settings')->tabs([
                     Forms\Components\Tabs\Tab::make(__('AI Integration'))->schema([
-                        Forms\Components\Select::make('ai_provider')
+                        Forms\Components\Select::make('ai.provider')
                             ->label(__("Provider"))
                             ->options([
                                 'groq' => 'GROQ',
                                 'openai' => 'OpenAI',
                             ])
                             ->default('groq'),
-                        Forms\Components\TextInput::make('ai_key')
+                        Forms\Components\TextInput::make('ai.key')
                             ->label(__('API Key'))
                             ->password()
                             ->revealable()

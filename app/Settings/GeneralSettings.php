@@ -6,8 +6,10 @@ use Spatie\LaravelSettings\Settings;
 
 class GeneralSettings extends Settings
 {
-    public string $ai_provider = "";
-    public string $ai_key = "";
+    public array $ai = [
+        'provider' => '',
+        'key' => ''
+    ];
 
     public static function group(): string
     {

@@ -26,9 +26,9 @@ class AIService
 
     private function bootstrap()
     {
-        $settings = app()->make(GeneralSettings::class);
-        $this->key = $settings->ai_key;
-        $this->setProvider($settings->ai_provider);
+        $settings = app()->make(GeneralSettings::class)->ai;
+        $this->key = data_get($settings, 'key');
+        $this->setProvider(data_get($settings, 'provider'));
     }
 
     public function setUser($user): self
