@@ -43,7 +43,7 @@ class ManagerIntegrationSettings extends SettingsPage
                             ])
                             ->default('groq'),
                         Forms\Components\TextInput::make('ai.key')
-                            ->label(__('API Key'))
+                            ->label(__('API key'))
                             ->password()
                             ->revealable()
                     ])->columns(2),

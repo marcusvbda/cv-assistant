@@ -19,6 +19,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use TomatoPHP\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -33,7 +34,6 @@ class AdminPanelProvider extends PanelProvider
             ->registration(Register::class)
             ->emailVerification()
             ->passwordReset()
-            ->profile()
             ->spa()
             ->colors([
                 'primary' => Color::Amber,
@@ -65,6 +65,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentLanguageSwitcherPlugin::make(),
+                FilamentEditProfilePlugin::make()
+                    ->slug('profile-access')
+                    ->setTitle(__("Access and profile"))
+                    ->setNavigationLabel(__("Access and profile"))
+                    ->setNavigationGroup(__("User management"))
+                    ->setIcon('heroicon-o-user')
             ]);
     }
 }

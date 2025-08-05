@@ -160,12 +160,12 @@ class ChatAI extends Component
 
     public function newThread(): Redirector|RedirectResponse
     {
-        return redirect()->to("/ai-assistant");
+        return redirect()->to("/admin/ai-assistant");
     }
 
     public function selectThread(int $threadId): Redirector|RedirectResponse
     {
-        return redirect()->to("/ai-assistant?thread={$threadId}");
+        return redirect()->to("/admin/ai-assistant?thread={$threadId}");
     }
 
     public function render(): View

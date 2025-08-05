@@ -27,19 +27,23 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
 
     public function getTitle(): string
     {
-        return __('User Details');
+        return __('User details');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Edit User Details');
+        return __('User details');
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __("User management");
+    }
 
     public function getBreadcrumbs(): array
     {
         return [
-            url('/user-profile') => __('User Details'),
+            url('/user-profile') => __('User details'),
             'edit' => __('Edit')
         ];
     }
@@ -123,7 +127,7 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Tabs::make('User Details')->statePath('formState')->tabs([
+            Forms\Components\Tabs::make('User details')->statePath('formState')->tabs([
                 Forms\Components\Tabs\Tab::make(__('General'))->schema([
                     Forms\Components\TextInput::make('name')->label(__("Name"))->required(),
                     Forms\Components\TextInput::make('position')->label(__("Position"))->required(),

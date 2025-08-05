@@ -17,7 +17,6 @@ class AiAssistant extends Page implements Forms\Contracts\HasForms
 
     public static function canAccess(): bool
     {
-        // return true;
         return Auth::user()->hasAiIntegration();
     }
 }
