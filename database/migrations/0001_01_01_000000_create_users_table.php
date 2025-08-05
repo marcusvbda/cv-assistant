@@ -20,6 +20,8 @@ return new class extends Migration
             $table->longText('introduction')->nullable();
             $table->string('position')->nullable();
             $table->longText('linkedin')->nullable();
+            $table->json('custom_fields')->nullable();
+            $table->string('avatar_url')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

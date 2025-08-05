@@ -6,12 +6,13 @@ use App\Settings\IntegrationSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Auth;
 use Carbon\Carbon;
+use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Facades\Storage;
 use TomatoPHP\FilamentLanguageSwitcher\Traits\InteractsWithLanguages;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, HasAvatar
 {
     use HasFactory, Notifiable, InteractsWithLanguages;
 
@@ -27,6 +28,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'introduction',
         'linkedin',
+        'avatar_url',
+        'custom_fields'
     ];
 
     /**
@@ -52,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'phones' => 'array',
             'urls' => 'array',
             'skills' => 'array',
+            'custom_fields' => 'array'
         ];
     }
 
@@ -145,5 +149,10 @@ class User extends Authenticatable implements MustVerifyEmail
         ]);
 
         return $userArray;
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->avatar_url ? Storage::url($this->avatar_url) : null;
     }
 }

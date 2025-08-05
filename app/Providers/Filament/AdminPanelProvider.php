@@ -67,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentLanguageSwitcherPlugin::make(),
                 FilamentEditProfilePlugin::make()
                     ->slug('profile-access')
+                    ->shouldShowAvatarForm()
                     ->setTitle(__("Access and profile"))
                     ->setNavigationLabel(__("Access and profile"))
                     ->setNavigationGroup(__("User management"))
