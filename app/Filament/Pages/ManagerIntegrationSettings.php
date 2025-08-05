@@ -2,16 +2,22 @@
 
 namespace App\Filament\Pages;
 
-use App\Settings\GeneralSettings;
+use App\Settings\IntegrationSettings;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
 
-class ManagerGeneral extends SettingsPage
+class ManagerIntegrationSettings extends SettingsPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static ?int $navigationSort = 99;
 
-    protected static string $settings = GeneralSettings::class;
+    protected static string $settings = IntegrationSettings::class;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __("Settings");
+    }
 
     public function getTitle(): string
     {

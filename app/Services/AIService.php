@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Settings\GeneralSettings;
+use App\Settings\IntegrationSettings;
 use Illuminate\Support\Facades\Cache;
 use OpenAI\Laravel\Facades\OpenAI;
 use Auth;
@@ -26,7 +26,7 @@ class AIService
 
     private function bootstrap()
     {
-        $settings = app()->make(GeneralSettings::class)->ai;
+        $settings = app()->make(IntegrationSettings::class)->ai;
         $this->key = data_get($settings, 'key');
         $this->setProvider(data_get($settings, 'provider'));
     }

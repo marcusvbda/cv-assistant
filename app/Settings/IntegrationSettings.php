@@ -4,7 +4,7 @@ namespace App\Settings;
 
 use Spatie\LaravelSettings\Settings;
 
-class GeneralSettings extends Settings
+class IntegrationSettings extends Settings
 {
     public array $ai = [
         'provider' => '',
@@ -13,6 +13,6 @@ class GeneralSettings extends Settings
 
     public static function group(): string
     {
-        return 'general';
+        return 'integrations';
     }
 }

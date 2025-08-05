@@ -10,7 +10,7 @@ return new class extends SettingsMigration
      */
     public function up(): void
     {
-        $this->migrator->add('general.ai', [
+        $this->migrator->add('integrations.ai', [
             'provider' => '',
             'key' => ''
         ]);
@@ -21,6 +21,6 @@ return new class extends SettingsMigration
      */
     public function down(): void
     {
-        $this->migrator->delete('general.ai');
+        $this->migrator->delete('integrations.ai');
     }
 };

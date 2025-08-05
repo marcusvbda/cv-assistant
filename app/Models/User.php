@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Settings\GeneralSettings;
+use App\Settings\IntegrationSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -97,7 +97,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasAiIntegration(): bool
     {
-        return boolval(data_get(app()->make(GeneralSettings::class)->ai, "provider"));
+        return boolval(data_get(app()->make(IntegrationSettings::class)->ai, "provider"));
     }
 
     public static function mapRelationToArray($relation, $fieds, $callback = null): array
