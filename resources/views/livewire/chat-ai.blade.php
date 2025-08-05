@@ -5,9 +5,9 @@
 <div>
     <div class="h-full grid grid-cols-1 gap-4 md:grid-cols-[300px_1fr]">
         <x-filament::card class="h-full">
-            <h2 class="text-lg font-bold mb-2">Rencent thread</h2>
+            <h2 class="text-lg font-bold mb-2">@lang("Rencent threads")</h2>
             <x-filament::button wire:click="newThread" class="mb-4 w-full" size="sm" icon="heroicon-o-plus">
-                New thread
+                @lang("New thread")
             </x-filament::button>
             <ul class="space-y-2 overflow-y-auto">
                 @foreach ($threads as $thread)
@@ -31,7 +31,7 @@
             </ul>
             @if ($hasMore)
                 <x-filament::button wire:click="loadMore" class="mt-8 w-full" size="sm">
-                    Load more threads
+                    @lang("Load more")
                 </x-filament::button>
             @endif
         </x-filament::card>
@@ -39,7 +39,7 @@
         <x-filament::card class="flex flex-col h-full">
             <div class="flex-1 overflow-y-auto space-y-4 px-2">
                 @if(count($messages) > 0)
-                    <h1 class="text-3xl font-bold mb-10">Chat AI</h1>
+                    <h1 class="text-3xl font-bold mb-10">Chat @lang("AI")</h1>
                 @endif
                 @forelse ($messages as $message)
                     @php 
@@ -49,13 +49,13 @@
                     @endphp
                     <div class="p-2 rounded-md {{ $isUser ? 'bg-primary-100 dark:bg-primary-500 text-right' : 'bg-gray-100 text-left dark:bg-gray-700' }} max-w-[80%] {{$isUser ? 'ml-auto' : 'mr-auto'}}">
                         <div class="text-sm text-gray-500 mb-1 dark:text-gray-100">
-                            {{ ucfirst(data_get($message,'role')) }}
+                            {{ __($isUser ? 'You' : 'Assistant') }}
                         </div>
                         <div class="text-sm">
                             @if (in_array(data_get($decodedContent, 'type'), [ChatAI::ANSWER_TYPE_TEXT, ChatAI::ANSWER_TYPE_HTML]))
                                 {!! data_get($decodedContent, 'content') !!}
                             @else 
-                                {{data_get($decodedContent, 'type')}} not implemented
+                                {{data_get($decodedContent, 'type')}} @lang("not implemented yet")
                             @endif
                         </div>
                     </div>
@@ -80,12 +80,12 @@
             <form wire:submit.prevent="createMessageInThread" class="flex items-center space-x-2 border border-gray-200 dark:border-gray-600 p-2 rounded-lg mt-10">
                 <x-filament::input
                     wire:model.defer="newMessage"
-                    placeholder="Type your message here..."
+                    placeholder="{{__('Type your message here')}}..."
                     :bordered="true"
                     class="flex-1" wire:loading.attr="disabled"
                 />
                 <x-filament::button type="submit"   wire:loading.attr="disabled">
-                    Send
+                    @lang("Send")
                 </x-filament::button>
             </form>
         </x-filament::card> 

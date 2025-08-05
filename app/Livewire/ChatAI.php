@@ -40,9 +40,9 @@ class ChatAI extends Component
     private function createSuggestions(): void
     {
         $this->suggestions = [
-            "Analyze my fit to this a description",
-            "Generate a Cover Letter",
-            "Generate a resume (CV)",
+            __("Analyze my fit to this a description"),
+            __("Generate a Cover Letter"),
+            __("Generate a resume (CV)"),
         ];
     }
 
@@ -359,7 +359,7 @@ Valid values for "type" are:
 ==================================================
 🧠 CONTEXT:
 ==================================================
-- Consider all provided functions and context regardless of language used.
+- Consider all provided functions and context regardless of language used in the last message.
 - For career-related questions, use the following context:
 $contextPayload
 
