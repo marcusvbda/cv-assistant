@@ -53,7 +53,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
-
+    'asset_url' => env('APP_URL', 'http://localhost') . env('ASSET_PATH', ''),
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
