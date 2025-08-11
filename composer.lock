@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b0c588213688f228855fea4cc5e7f908",
+    "content-hash": "1c185a11fd814d5ebdee9a6641bee1bc",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3864,6 +3864,33 @@
                 }
             ],
             "time": "2025-03-24T10:02:05+00:00"
+        },
+        {
+            "name": "mvbassalobre/grok-api-service",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "./packages/mvbassalobre/grok-api-service",
+                "reference": "b0ca38ed6bc2729387dea22becaf83fbac62e7ee"
+            },
+            "require": {
+                "spatie/laravel-settings": "^2.2|^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mvbassalobre\\GrokApiService\\": "src/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Vinicius Bassalobre",
+                    "email": "bassalobre.vinicius@gmail.com"
+                }
+            ],
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "nesbot/carbon",
@@ -11307,7 +11334,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "mvbassalobre/grok-api-service": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

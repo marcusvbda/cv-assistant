@@ -1,0 +1,20 @@
+{
+    "name": "mvbassalobre/grok-api-service",
+    "autoload": {
+        "psr-4": {
+            "Mvbassalobre\\GrokApiService\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Vinicius Bassalobre",
+            "email": "bassalobre.vinicius@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "spatie/laravel-settings": "^2.2|^3.0",
+        "filament/filament": "^3.0",
+        "spatie/laravel-package-tools": "^1.15.0"
+    }
+}
