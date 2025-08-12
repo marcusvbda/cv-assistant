@@ -10,8 +10,8 @@
     "license": "MIT",
     "repositories": [
         {
-            "type": "path",
-            "url": "./packages/mvbassalobre/groq-api-service"
+            "type": "vcs",
+            "url": "https://github.com/marcusvbda/groq-api-service.git"
         }
     ],
     "require": {
@@ -24,7 +24,7 @@
         "laravel/tinker": "^2.10.1",
         "league/commonmark": "^2.7",
         "league/html-to-markdown": "^5.1",
-        "mvbassalobre/groq-api-service": "@dev",
+        "marcusvbda/groq-api-service": "dev-master",
         "openai-php/client": "^0.13.0",
         "openai-php/laravel": "^0.13.0",
         "saade/filament-fullcalendar": "^3.2",

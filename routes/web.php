@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\PdfController;
 use Illuminate\Support\Facades\Route;
-use Mvbassalobre\GroqApiService\Services\GroqService;
+use marcusvbda\GroqApiService\Services\GroqService;
 
 Route::get('/', function () {
     // $service = new GroqService([]);
     // $service->user("hello, what is your name?")->ask();
-    // dd($service->getThread());
+    // dd($service->getThread(), $service->getLastMessage());
     return redirect('/admin');
 });
 

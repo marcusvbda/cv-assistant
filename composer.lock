@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ba876ce8d6e251d75c485765dedf94b",
+    "content-hash": "0d22fa0d84a026313443720753bed011",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3722,6 +3722,47 @@
             "time": "2025-07-17T05:12:15+00:00"
         },
         {
+            "name": "marcusvbda/groq-api-service",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/marcusvbda/groq-api-service.git",
+                "reference": "b430f1c2c1f00853095defee73c028d1322ed602"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/marcusvbda/groq-api-service/zipball/b430f1c2c1f00853095defee73c028d1322ed602",
+                "reference": "b430f1c2c1f00853095defee73c028d1322ed602",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^3.0",
+                "league/html-to-markdown": "*",
+                "openai-php/client": "^0.13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0",
+                "spatie/laravel-settings": "^2.2|^3.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "marcusvbda\\GroqApiService\\": "src/"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Vinicius Bassalobre",
+                    "email": "bassalobre.vinicius@gmail.com"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/marcusvbda/groq-api-service/tree/master",
+                "issues": "https://github.com/marcusvbda/groq-api-service/issues"
+            },
+            "time": "2025-08-12T08:46:35+00:00"
+        },
+        {
             "name": "masterminds/html5",
             "version": "2.10.0",
             "source": {
@@ -3952,36 +3993,6 @@
                 }
             ],
             "time": "2025-03-24T10:02:05+00:00"
-        },
-        {
-            "name": "mvbassalobre/groq-api-service",
-            "version": "dev-master",
-            "dist": {
-                "type": "path",
-                "url": "./packages/mvbassalobre/groq-api-service",
-                "reference": "908c37c4a071e5037baaeb1abf8bac2299c2a191"
-            },
-            "require": {
-                "filament/filament": "^3.0",
-                "php": "^8.2",
-                "spatie/laravel-package-tools": "^1.15.0",
-                "spatie/laravel-settings": "^2.2|^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Mvbassalobre\\GroqApiService\\": "src/"
-                }
-            },
-            "authors": [
-                {
-                    "name": "Vinicius Bassalobre",
-                    "email": "bassalobre.vinicius@gmail.com"
-                }
-            ],
-            "transport-options": {
-                "relative": true
-            }
         },
         {
             "name": "nesbot/carbon",
@@ -10221,16 +10232,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.5.31",
+            "version": "11.5.32",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "fc44414e0779e94640663b809557b0b599548260"
+                "reference": "101e132dcf9e74a1eb3a309b4f686114ae8f7f36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fc44414e0779e94640663b809557b0b599548260",
-                "reference": "fc44414e0779e94640663b809557b0b599548260",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/101e132dcf9e74a1eb3a309b4f686114ae8f7f36",
+                "reference": "101e132dcf9e74a1eb3a309b4f686114ae8f7f36",
                 "shasum": ""
             },
             "require": {
@@ -10302,7 +10313,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.31"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.32"
             },
             "funding": [
                 {
@@ -10326,7 +10337,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-11T05:27:39+00:00"
+            "time": "2025-08-12T07:32:49+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -11472,7 +11483,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "mvbassalobre/groq-api-service": 20
+        "marcusvbda/groq-api-service": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
