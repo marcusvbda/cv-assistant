@@ -14,14 +14,17 @@ class GroqService
 
     public function __construct(array $payload = [])
     {
+        $initialThread = data_get($payload, 'thread', []);
         $this->settings = array_merge(config('groq-api-service'), app()->make(GroqApiServiceSettings::class)->settings, [
-            'thread' => []
+            'thread' => $initialThread
         ], $payload);
 
         $this->makeGetters();
         $this->makeSetters();
 
-        $this->setThread($this->makeContextualizedThread());
+        if (empty($initialThread)) {
+            $this->setThread($this->makeContextualizedThread());
+        }
     }
 
     public function makeGetters(): void
@@ -98,6 +101,12 @@ class GroqService
             "role" => "system",
             "content" => implode("\n", $contextArray)
         ]];
+    }
+
+    public function getLastMessage(): mixed
+    {
+        $thread = $this->getThread();
+        return empty($thread) ? null : $thread[count($thread) - 1];
     }
 
     public function ask(): self
