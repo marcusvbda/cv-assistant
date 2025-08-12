@@ -3,9 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\User;
-use App\Services\AIService;
 use Filament\Pages\Page;
-use Filament\Actions;
 use Filament\Forms;
 use Auth;
 use Carbon\Carbon;
@@ -35,11 +33,6 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
         return __('User details');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __("User management");
-    }
-
     public function getBreadcrumbs(): array
     {
         return [
@@ -51,38 +44,7 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
     protected function getHeaderActions(): array
     {
         $actions = [];
-        if ($this->user->hasAiIntegration()) {
-            $actions[] = Actions\Action::make('improveWithAI')
-                ->label('Improve with AI')
-                ->icon('heroicon-m-sparkles')
-                ->action(fn() => $this->processAIImprovement());
-        }
-
         return $actions;
-    }
-
-    public function processAIImprovement()
-    {
-        $state = $this->formState;
-        unset($state["name"]);
-        unset($state["ai_integration"]);
-        unset($state["email"]);
-
-        $format = collect($state)->map(fn($value) => gettype(($value)))->toArray();
-        $service = AIService::make()
-            ->user('Improve or fix grammatically this dataset values (keep the JSON format) to create a polished, concise first-person resume summary optimized for ATS.')
-            ->user('Required fields: introduction, addresses (location, city), phones (type, number), links (name, value), skills (type, value (array of string)), courses (name, instituition, start_date, end_date), experiences (position, company, description, start_date, end_date), projects (name, description, start_date, end_date), certificates (name, description, date).')
-            ->user('if a field is not present, do not add it (except skills), just improve the existing ones.')
-            ->user(json_encode($state));
-
-        $suggestion = $service->json($format)->generate();
-
-        $this->formState = array_merge($this->formState, $suggestion);
-
-        Notification::make()
-            ->title('Suggestion from AI Service filled, please review and save if you like it.')
-            ->success()
-            ->send();
     }
 
     public function mount(): void
@@ -133,20 +95,6 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                     Forms\Components\TextInput::make('position')->label(__("Position"))->required(),
                     Forms\Components\TextInput::make('linkedin')->url(),
                     Forms\Components\Textarea::make('introduction')->label(__("Introduction"))->rows(5),
-                    Forms\Components\Actions::make([
-                        Forms\Components\Actions\Action::make('fillIntruductionWithAI')
-                            ->label(__("Fill with AI"))
-                            ->icon('heroicon-m-sparkles')
-                            ->action(function () {
-                                $state = $this->formState;
-                                unset($state["ai_integration"]);
-                                unset($state["introduction"]);
-                                $service = AIService::make()->user('You write polished, concise first-person resume summaries otimized to ATS without mention companies name. Reply ONLY with the summary in english with around 130 words, no extra text.')
-                                    ->user(json_encode($state));
-                                $this->formState["introduction"] = $service->generate();
-                            })
-                            ->disabled(fn() => !$this->user->hasAiIntegration())
-                    ])
                 ]),
                 Forms\Components\Tabs\Tab::make(__('Addresses'))->schema([
                     Forms\Components\Repeater::make('addresses')->hiddenLabel()
@@ -192,21 +140,6 @@ class UserDetails extends Page implements Forms\Contracts\HasForms
                             Forms\Components\DatePicker::make('end_date')->label(__("End date")),
                         ])->columns(2),
                         Forms\Components\Textarea::make('description')->label(__("Description"))->rows(5)->required(),
-                        Forms\Components\Actions::make([
-                            Forms\Components\Actions\Action::make('fillExperienceWithAI')
-                                ->label(__("Fill with AI"))
-                                ->icon('heroicon-m-sparkles')
-                                ->action(function (array $arguments, Forms\Set $set, Forms\Get $get) {
-                                    $service = AIService::make()->user('You write polished, concise description of the job experience otimized to ATS. Reply ONLY with the desciption in english, no extra text.')
-                                        ->user(json_encode([
-                                            'position' => $get('position'),
-                                            'company' => $get('company')
-                                        ]));
-                                    $set('description', $service->generate());
-                                })
-                                ->disabled(fn() => !$this->user->hasAiIntegration())
-                        ])
-
                     ])->reorderableWithDragAndDrop(false),
                 ]),
                 Forms\Components\Tabs\Tab::make(__("Projects"))->schema([

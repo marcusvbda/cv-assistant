@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasAvatar
         'introduction',
         'linkedin',
         'avatar_url',
+        'role',
         'custom_fields'
     ];
 
@@ -101,7 +102,7 @@ class User extends Authenticatable implements MustVerifyEmail, HasAvatar
 
     public function hasAiIntegration(): bool
     {
-        return boolval(data_get(app()->make(IntegrationSettings::class)->ai, "provider"));
+        return boolval(config("groq-api-service.key"));
     }
 
     public static function mapRelationToArray($relation, $fieds, $callback = null): array

@@ -13,6 +13,7 @@ class UserSeeder extends Seeder
             'name' => 'Root',
             'email' => 'root@root.com',
             'password' => bcrypt('roottoor'),
+            'role' => 'root',
             'email_verified_at' => now(),
         ]);
     }

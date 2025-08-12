@@ -12,7 +12,7 @@
             <ul class="space-y-2 overflow-y-auto">
                 @foreach ($threads as $thread)
                     @php
-                        $content = data_get(collect(data_get($thread, 'messages', []))->where('role', 'user')->first() ?? [], 'content',json_encode(["type" => ChatAI::ANSWER_TYPE_TEXT, "content" => "no title"]));
+                        $content = data_get(collect(data_get($thread, 'messages', []))->where('role', 'user')->first() ?? [], 'content');
                         $decodedContent = json_decode($content, true) ?? [];
                         $title = data_get($decodedContent, 'content', 'No title');
                         $currentId =  data_get($thread,"id");
@@ -44,19 +44,14 @@
                 @forelse ($messages as $message)
                     @php 
                         $isUser = data_get($message,'role') === 'user';
-                        $content = data_get($message, 'content',json_encode(["type" => ChatAI::ANSWER_TYPE_TEXT, "content" => ""]));
-                        $decodedContent = json_decode($content, true) ?? [];
+                        $content = data_get($message, 'content','');
                     @endphp
                     <div class="p-2 rounded-md {{ $isUser ? 'bg-primary-100 dark:bg-primary-500 text-right' : 'bg-gray-100 text-left dark:bg-gray-700' }} max-w-[80%] {{$isUser ? 'ml-auto' : 'mr-auto'}}">
                         <div class="text-sm text-gray-500 mb-1 dark:text-gray-100">
                             {{ __($isUser ? 'You' : 'Assistant') }}
                         </div>
                         <div class="text-sm">
-                            @if (in_array(data_get($decodedContent, 'type'), [ChatAI::ANSWER_TYPE_TEXT, ChatAI::ANSWER_TYPE_HTML]))
-                                {!! data_get($decodedContent, 'content') !!}
-                            @else 
-                                {{data_get($decodedContent, 'type')}} @lang("not implemented yet")
-                            @endif
+                            {!! $content !!}
                         </div>
                     </div>
                 @empty

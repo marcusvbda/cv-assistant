@@ -23,6 +23,6 @@ class ManagerGroqApiServiceSettings extends OriginalManagerGroqApiServiceSetting
 
     public static function canAccess(): bool
     {
-        return true;
+        return auth()?->user()?->role === "root";
     }
 }

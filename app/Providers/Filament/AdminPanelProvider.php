@@ -68,9 +68,6 @@ class AdminPanelProvider extends PanelProvider
                 FilamentEditProfilePlugin::make()
                     ->slug('profile-access')
                     ->shouldShowAvatarForm()
-                    ->setTitle(__("Access and profile"))
-                    ->setNavigationLabel(__("Access and profile"))
-                    ->setNavigationGroup(__("User management"))
                     ->setIcon('heroicon-o-user')
             ]);
     }

@@ -2,10 +2,11 @@
 
 namespace App\Filament\Widgets;
 
-use App\Services\AIService;
 use Filament\Widgets\Widget;
 use Auth;
 use Filament\Widgets\Concerns\CanPoll;
+use marcusvbda\GroqApiService\Services\GroqService;
+use Cache;
 
 class LinkedinAnalysisWidget extends Widget
 {
@@ -20,26 +21,46 @@ class LinkedinAnalysisWidget extends Widget
     {
         $user = Auth::user();
         $linkedin = $user->linkedin;
-        if (!$linkedin) {
-            $aiScore = [
-                "comment" => "no linkedin profile",
-                "score" => 0
+        return Cache::rememberForever($linkedin, function () use ($linkedin) {
+            if (!$linkedin) {
+                $aiScore = [
+                    "comment" => "no linkedin profile",
+                    "score" => 0
+                ];
+            } else {
+                $service = new GroqService([
+                    "thread" => [
+                        [
+                            "role" => "system",
+                            "content" => "Analyze this LinkedIn profile ($linkedin) in the note and provide a score (0-100) and comment/suggestions (max 200 characters)."
+                        ],
+                        [
+                            "role" => "user",
+                            "content" => "Also check for any grammar mistakes and other inconsistencies."
+                        ],
+                        [
+                            "role" => "user",
+                            "content" => "Respond ONLY with a valid JSON object, no explanations, no extra text, no greetings, no ```json"
+                        ],
+                        [
+                            "role" => "user",
+                            "content" => "The JSON format must be exactly:\n{\n  \"comment\": \"(string) your comment here\",\n  \"score\": (integer between 0 and 100)\n}\nIf the URL is missing, respond with empty or default values, but still valid JSON."
+                        ]
+                    ]
+                ])->ask();
+
+                $lastMessage = $service->getLastMessage();
+                $aiScore = json_decode(data_get($lastMessage, "content", "{}"));
+                $score = data_get($aiScore, "score", 0);
+                $scorePercentage = intval(($score / 100) * 100);
+            }
+
+            return [
+                'feedback' => data_get($aiScore, "comment", "no comment"),
+                'score' => $score ?? 0,
+                'scorePercentage' => $scorePercentage ?? 0,
             ];
-        } else {
-            $service = AIService::make()->user('Analyze the linkedin profile (url provided) in the note and provide score (0-100) and comment/suggestions (max 200 characters).')
-                ->user($user->linkedin)
-                ->user("Also let me know about any grammar mistakes and other inconsistencies.");
-            $aiScore = $service->json(["comment" => "...", "score" => "..."])->generate();
-
-            $score = data_get($aiScore, "score", 0);
-            $scorePercentage = intval(($score / 100) * 100);
-        }
-
-        return [
-            'feedback' => data_get($aiScore, "comment", "no comment"),
-            'score' => $score ?? 0,
-            'scorePercentage' => $scorePercentage ?? 0,
-        ];
+        });
     }
 
     public static function canView(): bool
