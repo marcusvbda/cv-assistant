@@ -16,7 +16,7 @@ class GroqService
     {
         $this->settings = array_merge(config('groq-api-service'), app()->make(GroqApiServiceSettings::class)->settings, [
             'thread' => []
-        ]);
+        ], $payload);
 
         $this->makeGetters();
         $this->makeSetters();
@@ -42,7 +42,7 @@ class GroqService
         }
     }
 
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): mixed
     {
         if (isset($this->dynamicMethods[$name])) {
             return call_user_func_array($this->dynamicMethods[$name], $arguments);
@@ -82,7 +82,7 @@ class GroqService
         return $converter->convert($html);
     }
 
-    public function makeContextualizedThread()
+    public function makeContextualizedThread(): array
     {
         $contextArray = [
             "## RULES",
