@@ -3727,12 +3727,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcusvbda/groq-api-service.git",
-                "reference": "b430f1c2c1f00853095defee73c028d1322ed602"
+                "reference": "9e00b1d552b7cbc19a445f6ebb9c95e8e2009a95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcusvbda/groq-api-service/zipball/b430f1c2c1f00853095defee73c028d1322ed602",
-                "reference": "b430f1c2c1f00853095defee73c028d1322ed602",
+                "url": "https://api.github.com/repos/marcusvbda/groq-api-service/zipball/9e00b1d552b7cbc19a445f6ebb9c95e8e2009a95",
+                "reference": "9e00b1d552b7cbc19a445f6ebb9c95e8e2009a95",
                 "shasum": ""
             },
             "require": {
@@ -3760,7 +3760,7 @@
                 "source": "https://github.com/marcusvbda/groq-api-service/tree/master",
                 "issues": "https://github.com/marcusvbda/groq-api-service/issues"
             },
-            "time": "2025-08-12T08:46:35+00:00"
+            "time": "2025-08-12T18:14:07+00:00"
         },
         {
             "name": "masterminds/html5",

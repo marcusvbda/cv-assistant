@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Settings\IntegrationSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,6 +9,7 @@ use Carbon\Carbon;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Storage;
+use marcusvbda\GroqApiService\Settings\GroqApiServiceSettings;
 use TomatoPHP\FilamentLanguageSwitcher\Traits\InteractsWithLanguages;
 
 class User extends Authenticatable implements MustVerifyEmail, HasAvatar
@@ -102,7 +102,8 @@ class User extends Authenticatable implements MustVerifyEmail, HasAvatar
 
     public function hasAiIntegration(): bool
     {
-        return boolval(config("groq-api-service.key"));
+        $settings = app()->make(GroqApiServiceSettings::class)->settings;
+        return !empty(data_get($settings, 'key'));
     }
 
     public static function mapRelationToArray($relation, $fieds, $callback = null): array

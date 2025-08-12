@@ -12,9 +12,7 @@
             <ul class="space-y-2 overflow-y-auto">
                 @foreach ($threads as $thread)
                     @php
-                        $content = data_get(collect(data_get($thread, 'messages', []))->where('role', 'user')->first() ?? [], 'content');
-                        $decodedContent = json_decode($content, true) ?? [];
-                        $title = data_get($decodedContent, 'content', 'No title');
+                        $title = data_get(collect(data_get($thread, 'messages', []))->where('role', 'user')->first() ?? [], 'content');
                         $currentId =  data_get($thread,"id");
                     @endphp
                     <li>

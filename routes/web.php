@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 use marcusvbda\GroqApiService\Services\GroqService;
 
 Route::get('/', function () {
-    // $service = new GroqService([]);
-    // $service->user("hello, what is your name?")->ask();
-    // dd($service->getThread(), $service->getLastMessage());
+    $service = new GroqService();
+    $service->user("hello, what is your name?")->ask();
+    dd($service->getLastMessage());
     return redirect('/admin');
 });
 
