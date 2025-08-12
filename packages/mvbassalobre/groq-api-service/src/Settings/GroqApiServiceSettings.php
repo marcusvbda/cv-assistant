@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Settings;
+namespace Mvbassalobre\GroqApiService\Settings;
 
 use Spatie\LaravelSettings\Settings;
 
-class GrokApiServiceSettings extends Settings
+class GroqApiServiceSettings extends Settings
 {
     public array $settings = [
         'initial_instructions' => '',
@@ -15,6 +15,6 @@ class GrokApiServiceSettings extends Settings
 
     public static function group(): string
     {
-        return 'grok_api';
+        return 'groq_api';
     }
 }

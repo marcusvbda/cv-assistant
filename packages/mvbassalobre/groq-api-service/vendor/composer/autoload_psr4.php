@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Mvbassalobre\\GrokApiService\\' => array($baseDir . '/src'),
+    'Mvbassalobre\\GroqApiService\\' => array($baseDir . '/src'),
 );

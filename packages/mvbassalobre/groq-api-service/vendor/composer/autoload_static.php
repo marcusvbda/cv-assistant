@@ -6,21 +6,21 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitca3d357076fe57f0459690ec449b9a16
 {
-    public static $prefixLengthsPsr4 = array (
-        'M' => 
-        array (
-            'Mvbassalobre\\GrokApiService\\' => 28,
+    public static $prefixLengthsPsr4 = array(
+        'M' =>
+        array(
+            'Mvbassalobre\\GroqApiService\\' => 28,
         ),
     );
 
-    public static $prefixDirsPsr4 = array (
-        'Mvbassalobre\\GrokApiService\\' => 
-        array (
+    public static $prefixDirsPsr4 = array(
+        'Mvbassalobre\\GroqApiService\\' =>
+        array(
             0 => __DIR__ . '/../..' . '/src',
         ),
     );
 
-    public static $classMap = array (
+    public static $classMap = array(
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
@@ -30,7 +30,6 @@ class ComposerStaticInitca3d357076fe57f0459690ec449b9a16
             $loader->prefixLengthsPsr4 = ComposerStaticInitca3d357076fe57f0459690ec449b9a16::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitca3d357076fe57f0459690ec449b9a16::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInitca3d357076fe57f0459690ec449b9a16::$classMap;
-
         }, null, ClassLoader::class);
     }
 }

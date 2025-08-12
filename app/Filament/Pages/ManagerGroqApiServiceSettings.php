@@ -2,21 +2,21 @@
 
 namespace App\Filament\Pages;
 
-use App\Settings\GrokApiServiceSettings;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
+use Mvbassalobre\GroqApiService\Settings\GroqApiServiceSettings;
 
-class ManagerGrokApiServiceSettings extends SettingsPage
+class ManagerGroqApiServiceSettings extends SettingsPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?int $navigationSort = 99;
 
-    protected static string $settings = GrokApiServiceSettings::class;
+    protected static string $settings = GroqApiServiceSettings::class;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Grok API Service Settings');
+        return __('Groq API Service Settings');
     }
 
     public function getTitle(): string
@@ -26,7 +26,7 @@ class ManagerGrokApiServiceSettings extends SettingsPage
 
     public static function getNavigationLabel(): string
     {
-        return __('Grok API Service Settings');
+        return __('Groq API Service Settings');
     }
 
     public function form(Form $form): Form
@@ -34,7 +34,7 @@ class ManagerGrokApiServiceSettings extends SettingsPage
         return $form
             ->schema([
                 Forms\Components\Tabs::make('settings')->tabs([
-                    Forms\Components\Tabs\Tab::make(__('Grok API Service'))->schema([
+                    Forms\Components\Tabs\Tab::make(__('Groq API Service'))->schema([
                         Forms\Components\RichEditor::make('settings.initial_instructions')
                             ->label(__("Initial Instructions"))
                             ->disableToolbarButtons(['attachFiles'])
@@ -54,5 +54,10 @@ class ManagerGrokApiServiceSettings extends SettingsPage
                     ]),
                 ])
             ])->columns(1);
+    }
+
+    public static function canAccess(): bool
+    {
+        return true;
     }
 }

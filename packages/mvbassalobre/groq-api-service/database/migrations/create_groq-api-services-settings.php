@@ -6,7 +6,7 @@ return new class extends SettingsMigration
 {
     public function up(): void
     {
-        $this->migrator->add('grok_api.settings', [
+        $this->migrator->add('groq_api.settings', [
             'initial_instructions' => '',
             'absolute_rules' => '',
             'expected_response_type' => '',
@@ -16,6 +16,6 @@ return new class extends SettingsMigration
 
     public function down(): void
     {
-        $this->migrator->delete('grok_api.settings');
+        $this->migrator->delete('groq_api.settings');
     }
 };
